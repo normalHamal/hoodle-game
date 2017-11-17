@@ -7,7 +7,7 @@
         queue: null,    // 资源下载队列
         bg: null,       // 背景
         hoodle: null,   // 弹珠
-        obstacle: null, // 障碍物
+        obstacles: null, // 障碍物
         // 预加载图片素材
         load: function() {
             // 图片素材列表
@@ -27,16 +27,8 @@
             // 资源下载完成后的Image对象赋值
             this.bg       = this.queue.get('bg').content;
             this.hoodle   = this.queue.get('hoodle').content;
+            this.obstacles = this.queue.get('obstacles').content;
 
-            var obstacles = this.queue.get('obstacles').content;
-            // 切图
-            this.obstacleGlyphs = {
-	            0: {image: obstacles, rect: [0,0,30,30]},
-	            1: {image: obstacles, rect: [0,30,30,30]},
-	            2: {image: obstacles, rect: [0,60,30,30]},
-	            3: {image: obstacles, rect: [0,90,30,30]},
-	            4: {image: obstacles, rect: [0,120,30,30]}
-	        };
             //删除下载队列的complete事件监听
             this.queue.off('complete');
             //发送complete事件

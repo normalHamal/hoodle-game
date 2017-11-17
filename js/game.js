@@ -70,9 +70,9 @@
 
         	// 初始化
         	this.initBackground();
-        	this.initHoodle();
             this.initTitle();
-            this.initObstacle();
+            this.initObstacles();
+            this.initHoodle();
         	// 开始游戏
         	this.gameReady();
     	},
@@ -146,36 +146,19 @@
                 startX: this.width - 30 >> 1,
                 stageX: this.width,
                 stageY: this.height
-            }).addTo(this.stage);
+            }).addTo(this.stage, this.obstacles.depth - 1);
     	},
         /*
         *  初始化障碍物
         */
-        initObstacle: function () {
-            var startX = 36
-              , startY = 84
-              , paddingX = startX
-              , paddingY = startY;
-
-            this.obstacles = Array.from({length: 22}, function (obj, i) {
-                obj = new game.Obstacle({
-                    id: 'obstacle' + i,
-                    image: this.asset.obstacle,
-                    width: 30,
-                    height: 30
-                }).addTo(this.stage);
-                // 设置障碍物起始坐标y
-                startX += i === 0 ? 0 : 60 + Math.random() * 32 >> 0;
-                var overflowX = startX + obj.width + paddingX - this.width;
-                if (overflowX > 0) {
-                    startX = overflowX + paddingX;
-                    startY += 30 + Math.random() * 32 >> 0;
-                }
-                obj.x  = startX;
-                // obj.x = overflowX > 0 ? (startX = overflowX + paddingX, startY += 30 + Math.random() * 32 >> 0) : startX;
-                obj.y = startY > this.height - paddingY ? this.height - paddingY : startY;
-                return obj;
-            }.bind(this));
+        initObstacles: function () {
+            this.obstacles = new game.Obstacles({
+                id: 'obstacles',
+                image: this.asset.obstacles,
+                height: this.height,
+                width: this.width,
+                amount: 22,
+            }).addTo(this.stage);
         },
     	onUpdate: function () {
             if (this.state === 'ready') {
