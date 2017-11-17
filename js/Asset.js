@@ -14,7 +14,7 @@
             var resources = [
                 {id: 'bg', src: 'images/bg.jpg'},
                 {id: 'hoodle', src: 'images/hoodle.png'},
-                {id: 'obstacle', src: 'images/obstacle.png'}
+                {id: 'obstacles', src: 'images/obstacles.png'}
             ];
 
             this.queue = new Hilo.LoadQueue(); // 实例化一个下载队列 
@@ -27,7 +27,16 @@
             // 资源下载完成后的Image对象赋值
             this.bg       = this.queue.get('bg').content;
             this.hoodle   = this.queue.get('hoodle').content;
-            this.obstacle = this.queue.get('obstacle').content;
+
+            var obstacles = this.queue.get('obstacles').content;
+            // 切图
+            this.obstacleGlyphs = {
+	            0: {image: obstacles, rect: [0,0,30,30]},
+	            1: {image: obstacles, rect: [0,30,30,30]},
+	            2: {image: obstacles, rect: [0,60,30,30]},
+	            3: {image: obstacles, rect: [0,90,30,30]},
+	            4: {image: obstacles, rect: [0,120,30,30]}
+	        };
             //删除下载队列的complete事件监听
             this.queue.off('complete');
             //发送complete事件

@@ -8,12 +8,16 @@
 	        Hoodle.superclass.constructor.call(this, properties);
 	        // 初始化参数
 	        Hilo.copy(this, properties, true);
+
+	        // 设置加速度
+	    	this.gravity = 10 / 1000 * 0.3;
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
 	    stageX:  0,     // 舞台的宽度
 	    stageY:  0, 	// 舞台的高度
 	    gravity: 0, 	// 重力加速度
+	    startTime: 0,   // 开始下落时间
 	    move: 0, 		// 当前弹珠位移
 	    isStatic: true, // 弹珠是否已静止
 	    up:   0,        // 弹珠往上弹次数
@@ -22,8 +26,6 @@
 	    	//设置起始坐标
 	        this.x = this.startX;
 	        this.y = this.startY;
-	        // 设置加速度
-	    	this.gravity = 1;
 		},
 		// 开始下落
 		startDown: function () {
