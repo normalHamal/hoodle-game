@@ -1,7 +1,7 @@
 (function (ns) {
 	var Obstacles = ns.Obstacles = Hilo.Class.create({
-		Extends: Hilo.Bitmap,
-		// 构造函数
+		Extends: Hilo.Container,
+
 		constructor: function(properties) {
 			properties = properties || {};
 			// 调用父类构造函数
@@ -24,7 +24,7 @@
 	    	this.baseSpaceY = 30;
 	    	// 浮动间距最大值 (间距 = 最小间距 + 浮动间距)
 	    	this.floatSpace = 32;
-
+	    	
 	    	this.createObstacles(properties.image);
 	    },
 	    amount: 0,
@@ -42,6 +42,7 @@
 	    createObstacles: function (image) {
 	    	for (var i = 0, l = this.amount; i < l; i += 1) {
 	    		// 随机创建不同颜色的障碍物
+	    		// 障碍物被添加到容器内的深度会逐步提升
 	    		var obstacle = new Hilo.Bitmap({
 	    			id: 'obstacle' + i,
 	    			image: image,
@@ -61,12 +62,11 @@
 	    		this.startX = this.paddingX + Math.random() * this.floatSpace >> 0;
 	    		this.startY = this.paddingY + Math.random() * this.floatSpace >> 0;
 	    	} else {
-	    		this.startX = this.baseSpaceX + Math.random() * this.floatSpace >> 0;
+	    		this.startX += this.baseSpaceX + Math.random() * this.floatSpace >> 0;
 	    	}
 
 	    	var overflowX = this.startX + obstacle.width + this.paddingX - this.width;
 	    	var overflowY = this.startY + obstacle.height + this.paddingY - this.height;
-
             if (overflowX > 0) {
                 this.startX = overflowX + this.paddingX;
                 this.startY += this.baseSpaceY + Math.random() * this.floatSpace >> 0;
@@ -79,13 +79,51 @@
 	    *	重置障碍物位置（并不重新创建而只是改变位置）
 	    */
 	    resetObstacles: function () {
-
+	    	// 将容器的所有子元素乱序
+	    	this.sortChildren(function () {
+	    		return 0.5 - Math.random();
+	    	});
+	    	// 然后重新设置位置
+	    	this.children.forEach(function (child, index) {
+	    		// 设置障碍物的位置
+	    		this.setPosition(child, index);
+	    	}.bind(this));
 	    },
 	    /*
 	    *	检测碰撞
 	    */
-	    checkCollision: function () {
-	    	
+	    checkCollision: function (hoodle) {
+	    	//  障碍物半径
+   			var obstacleRadius = this.children[0].width >> 1;
+   			//  弹珠圆心
+       		var centerHoodle   = {
+       			x: hoodle.x + hoodle.width / 2,
+       			y: hoodle.y + hoodle.height / 2
+       		};
+       		//  遍历所有障碍物
+	    	for(var i = 0, l = this.children.length; i < l; i += 1) {
+	    		var obstacle = this.children[i];
+	    		//  障碍物圆心
+	       		var centerObstacle = {
+	       			x: obstacle.x + obstacle.width / 2,
+	       			y: obstacle.y + obstacle.height / 2
+	       		};
+	       		//  障碍物中心点和弹珠中心点距离
+       			var distance = Math.sqrt(Math.pow((centerHoodle.x - centerObstacle.x), 2) +
+       					   			Math.pow((centerHoodle.y - centerObstacle.y), 2)) -
+       									(hoodle.radius + obstacleRadius);
+       			//	碰撞
+	            if (distance < 0) {
+	            	//  将弹珠定格在碰撞瞬间的位置
+	            	var theta = Math.atan2(hoodle.y - obstacle.y, hoodle.x - obstacle.x);
+	            	hoodle.x += Math.abs(distance) * Math.cos(theta);
+	            	hoodle.y += Math.abs(distance) * Math.sin(theta);
+
+	            	hoodle.collisionCircle(obstacle, centerObstacle);
+	            	return true;
+	            }
+	        }
+	        return false;
 	    }
 	});
 })(window.game)

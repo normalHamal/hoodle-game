@@ -4,10 +4,10 @@
         // EventMixin是一个包含事件相关功能的mixin
         // 此处是为了给对象增加事件功能(比如fire方法)
         Mixes: Hilo.EventMixin,
-        queue: null,    // 资源下载队列
-        bg: null,       // 背景
-        hoodle: null,   // 弹珠
-        obstacles: null, // 障碍物
+        queue: null,         // 资源下载队列
+        bg: null,            // 背景
+        hoodleAtlas: null,   // 弹珠
+        obstacles: null,     // 障碍物
         // 预加载图片素材
         load: function() {
             // 图片素材列表
@@ -25,9 +25,25 @@
         // 资源下载完成
         onComplete: function () {
             // 资源下载完成后的Image对象赋值
-            this.bg       = this.queue.get('bg').content;
-            this.hoodle   = this.queue.get('hoodle').content;
+            this.bg        = this.queue.get('bg').content;
             this.obstacles = this.queue.get('obstacles').content;
+
+            this.hoodleAtlas = new Hilo.TextureAtlas({
+                image: this.queue.get('hoodle').content,
+                frames: [
+                    [0, 0, 30, 30],
+                    [0, 30, 30, 30],
+                    [0, 60, 30, 30],
+                    [0, 90, 30, 30],
+                    [0, 120, 30, 30],
+                    [0, 150, 30, 30],
+                    [0, 180, 30, 30],
+                    [0, 210, 30, 30]
+                ],
+                sprites: {
+                    hoodle: [0, 1, 2, 3, 4, 5, 6, 7]
+                }
+            });
 
             //删除下载队列的complete事件监听
             this.queue.off('complete');

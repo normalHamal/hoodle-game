@@ -16,6 +16,7 @@
         bg: null,        // 背景
         hoodle: null,    // 弹珠
         obstacles: null, // 障碍物集合
+
         init: function () {
         	this.asset = new game.Asset();
             this.asset.on('complete', function(e){
@@ -24,7 +25,9 @@
             }.bind(this));
             this.asset.load();
         },
-    	// 初始化舞台
+        /*
+        *   初始化舞台
+        */
     	initStage: function () {
     		this.width  = 659;  // 初始化舞台宽
     		this.height = 323; // 初始化舞台高
@@ -70,27 +73,39 @@
 
         	// 初始化
         	this.initBackground();
-            this.initTitle();
+            // this.initTitle();
             this.initObstacles();
             this.initHoodle();
         	// 开始游戏
         	this.gameReady();
     	},
-    	// 鼠标输入
+        /*
+        *   鼠标输入
+        */
     	onUserInput: function () {
     		if(this.state === 'start') {
                 this.hoodle.startDown()
                 this.state = 'playing';
             } else if (this.state === 'over') {
                 this.gameReady();
+            } else if (this.state === 'playing') {
+            	this.ticker.pause();
+            	this.state = 'pause';
+            } else {
+            	this.ticker.resume();
+            	this.state = 'playing';
             }
     	},
-    	// 开始游戏
+        /*
+        *   开始游戏
+        */
     	gameReady: function () {
     		this.state = 'start';
             this.hoodle.getReady();
     	},
-        // 结束游戏
+        /*
+        *   结束游戏
+        */
     	gameOver: function () {
     		if(this.state !== 'over') {
                 //设置当前状态为结束over
@@ -120,19 +135,18 @@
         *  初始化标题
         */
         initTitle: function(){
-            // 当前分数
-            this.title = new Hilo.Text({
-            	id: 'title',
-                text: '滑稽家族'
-            }).addTo(this.stage, 0);
-            // 设置标题样式
-            var fontSize = 20;
-            this.title.setFont(fontSize + 'px arial');
-            this.title.color = '#428bca';
-            // 设置标题的位置
-            // 没有渲染之前textWidth为0，所以此处只能自己给值
-            this.title.x = this.width - fontSize * 4 >> 1;
-            this.title.y = this.height - fontSize - 2;
+            // this.title = new Hilo.Text({
+            // 	id: 'title',
+            //     text: '滑稽家族'
+            // }).addTo(this.stage, 0);
+            // // 设置标题样式
+            // var fontSize = 20;
+            // this.title.setFont(fontSize + 'px arial');
+            // this.title.color = '#428bca';
+            // // 设置标题的位置
+            // // 没有渲染之前textWidth为0，所以此处只能自己给值
+            // this.title.x = this.width - fontSize * 4 >> 1;
+            // this.title.y = this.height - fontSize - 2;
         },
         /*
         * 初始化弹珠
@@ -140,13 +154,13 @@
     	initHoodle: function () {
     		this.hoodle = new game.Hoodle({
                 id: 'hoodle',
-                image: this.asset.hoodle,
+                atlas: this.asset.hoodleAtlas,
                 width: 30,
                 height: 30,
-                startX: this.width - 30 >> 1,
+                startX: this.width - 30,
                 stageX: this.width,
                 stageY: this.height
-            }).addTo(this.stage, this.obstacles.depth - 1);
+            }).addTo(this.stage);
     	},
         /*
         *  初始化障碍物
@@ -164,8 +178,13 @@
             if (this.state === 'ready') {
                 return;
             }
-            if (this.hoodle.isStatic && this.hoodle.y !== 0) {
+
+            if (this.hoodle && this.hoodle.isStatic && this.hoodle.y !== 0) {
                 this.gameOver();
+            } else {
+				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
+				//	弹珠发生碰撞
+				}
             }
         }
     };
