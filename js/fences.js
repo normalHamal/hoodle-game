@@ -53,17 +53,19 @@
 	    	for(var i = 0, l = this.children.length; i < l; i += 1) {
 	    		var fence = this.children[i];
        			//	碰撞
-	            if (hoodle.hitTestObject(fence)) {
+	            if (hoodle.hitTestObject(fence, true)) {
 	            	// 将弹珠定格在碰撞瞬间的位置
 
 	            	// 判断撞击左边
-	            	if (hoodle.y >= fence.y + this.topCircleRadius && hoodle.x <= fence.x ) {
+	            	if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x > fence.x - hoodle.radius && hoodle.x
+	            		 < fence.x) {
 	            		hoodle.x = fence.x - hoodle.radius;
 	            		// 弹珠做出反应
 	            		hoodle.collisionSquare('left');
 	            	}
 	            	// 判断撞击右边
-	            	else if (hoodle.y >= fence.y + this.topCircleRadius && hoodle.x > fence.x) {
+	            	else if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x < fence.x + fence.width + hoodle.radius &&
+	            		 hoodle.x > fence.x) {
 	            		hoodle.x = fence.x + fence.width + hoodle.radius;
 	            		// 弹珠做出反应
 	            		hoodle.collisionSquare('right');
