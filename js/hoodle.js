@@ -52,7 +52,7 @@
 	        this.x        = this.startX;
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
-	        this.moveX    = -10;
+	        this.moveX    = -6;
 	        this.moveY    = 0;
 	        this.startRotate(6000, 360, true)
 		},

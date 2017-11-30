@@ -152,10 +152,10 @@
     		this.hoodle = new game.Hoodle({
                 id: 'hoodle',
                 image: this.asset.hoodle,
-                width: 30,
-                height: 30,
-                startX: this.width - 15,
-                startY: 15,
+                width: 18,
+                height: 18,
+                startX: this.width - 9,
+                startY: 9,
                 stageX: this.width,
                 stageY: this.height
             }).addTo(this.stage);
