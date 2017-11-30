@@ -14,26 +14,22 @@
 	}
 
 	var Hoodle = ns.Hoodle = Hilo.Class.create({
-		Extends: Hilo.Sprite,
+		Extends: Hilo.Bitmap,
 
 		constructor: function(properties) {
 			properties   = properties || {};
 			// 调用父类构造函数
 	        Hoodle.superclass.constructor.call(this, properties);
-	        // 往精灵动画序列中增加帧
-	        this.addFrame(properties.atlas.getSprite('hoodle'));
-	        // 设置精灵动画的帧间隔
-	        this.interval = 7;
 	        // 初始化参数
-	        Hilo.copy(this, properties, true);
+	        Hilo.util.copy(this, properties, true);
 	        // 设置重力加速度
 	    	this.speedUpY = this.gravity = 0.3;
 	    	//  假设摩擦系数为 0.4
 	    	this.force    = this.gravity * 0.4;
 	    	// 设置弹力变量
 	    	this.bounce   = 0.8;
-	    	//  设置弹珠半径
-	    	this.radius   = this.width >> 1;
+	    	//  设置弹珠半径中心点
+	    	this.radius = this.pivotX = this.pivotY = this.width >> 1;
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
@@ -58,9 +54,26 @@
 	        this.speedUpX = 0;
 	        this.moveX    = -10;
 	        this.moveY    = 0;
-	        this.interval = 7;
-	        this.play();
+	        this.startRotate(6000, 360, true)
 		},
+		startRotate: function (time, angle, loop) {
+	        var me = this;
+	        me.stopRotate();
+
+	        time = time || 6000;
+	        angle = angle || 360;
+	        me.rotation = 0;
+	        me.rotateTween = Hilo.Tween.to(me, {rotation:angle}, {time:time, loop:loop});
+	        return me;
+	    },
+	    stopRotate: function () {
+	        var me = this;
+	        if (me.rotateTween) {
+	            me.rotateTween.stop();
+	            me.rotateTween = null;
+	        }
+	        return me;
+	    },
 		/*
 		*  开始下落
 		*/
@@ -68,10 +81,22 @@
 			// 恢复弹珠状态
 			this.isStatic = false;
 		},
+		/**
+		*  碰撞反弹 (针对方形)
+		*/
+		collisionSquare: function (direction) {
+			if (['left', 'right', 'side'].some(function (i) { return i === direction; })) {
+				// 速度反向并减少
+				this.moveX *= this.bounce * -1;
+			} else {
+				// 速度反向并减少
+		        this.moveY *= this.bounce * -1;
+			}
+		},
 		/*
         *  碰撞反弹 (针对圆形)
         */
-       	collisionCircle: function (obstacle, centerObstacle) {
+       	collisionCircle: function (centerCircle) {
    			//  将弹珠的速度表示为向量形式
    			var speed = {
    				x: this.moveX,
@@ -79,8 +104,8 @@
    			}
    			//  撞击平面法向量
    			var normal = {
-   				x: this.x - centerObstacle.x,
-   				y: this.y - centerObstacle.y
+   				x: this.x - centerCircle.x,
+   				y: this.y - centerCircle.y
    			}
    			//  将法向量单位化
    			var inv = 1 / Math.sqrt(normal.x * normal.x + normal.y * normal.y);
@@ -91,7 +116,26 @@
 
    			this.moveX = speed.x * this.bounce;
    			this.moveY = speed.y * this.bounce;
+   			
+   			// this.judgeStatic();
        	},
+       	/*
+	   	*  判断弹珠是否停止并更新弹珠状态
+	   	*/
+	   	judgeStatic: function () {
+	   		// 判断是否速度为0即静止状态
+	        if (Math.abs(this.moveY) <= this.stageY / 1000) {
+	        	// 垂直方向静止
+	        	this.moveY = 0;
+	        	// 因为摩擦力存在所以有了水平加速度
+	    		this.speedUpX = this.moveX > 0 ? -this.force : this.force;
+	    		if (Math.abs(this.moveX) <= this.stageY / 1000) {
+	    			// 弹珠静止
+	    			this.moveX = 0;
+	        		this.isStatic = true;
+	    		}
+	        }
+	   	},
 		/*
 		*  整个弹跳过程
 		*/
@@ -108,35 +152,21 @@
 		    //   x轴坐标
 		    var x = this.x + this.moveX;
 
-		    if(y > this.stageY - this.height) {
+		    if(y > this.stageY - this.pivotY) {
 		        // 弹珠碰触地面
-		        this.x = x;
-		        this.y = this.stageY - this.height;
-		        // 速度反向并减少
-		        this.moveY *= this.bounce * -1;
-		        // 判断是否速度为0即静止状态
-		        if (Math.abs(this.moveY) <= this.stageY / 1000) {
-		        	// 垂直方向静止
-		        	this.moveY = 0;
-		        	// 因为摩擦力存在所以有了水平加速度
-		    		this.speedUpX = this.moveX > 0 ? -this.force : this.force;
-		    		if (Math.abs(this.moveX) <= this.stageY / 1000) {
-		    			// 弹珠静止
-		    			this.moveX = 0;
-		        		this.isStatic = true;
-		        		this.stop();
-		    		}
-		        }
+		        this.y = this.stageY - this.pivotY;
+		        this.collisionSquare('bottom');
+
+		        this.judgeStatic();
 		    } else {
 		    	// 弹珠没有碰到地面
 				this.y = y;
 		    }
 
-		    if (x < 0 || x > this.stageX - this.width) {
+		    if (x < 0 + this.pivotX || x > this.stageX - this.pivotX) {
 		    	// 弹珠触碰墙壁
-	    		this.x      = x < 0 ? 0 : this.stageX - this.width;
-	    		// 速度反向并减少
-	    		this.moveX *= this.bounce * -1;
+	    		this.x      = x < this.pivotX ? this.pivotX : this.stageX - this.pivotX;
+	    		this.collisionSquare('side');
 	    	} else {
 	    		// 弹珠没有触碰墙壁
 	    		this.x = x;

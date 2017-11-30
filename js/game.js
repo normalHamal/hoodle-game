@@ -16,6 +16,7 @@
         bg: null,        // 背景
         hoodle: null,    // 弹珠
         obstacles: null, // 障碍物集合
+        fences: null,    // 栅栏
 
         init: function () {
         	this.asset = new game.Asset();
@@ -29,9 +30,9 @@
         *   初始化舞台
         */
     	initStage: function () {
-    		this.width  = 659;  // 初始化舞台宽
-    		this.height = 323; // 初始化舞台高
-    		this.scale  = 1;                  // 初始化舞台缩放比
+    		this.width  = 667; // 初始化舞台宽
+    		this.height = 375; // 初始化舞台高
+    		this.scale = 1;   // 初始化舞台缩放比
 
     	    // 实例化一个舞台对象
     	    var stage = this.stage = new Hilo.Stage({
@@ -58,8 +59,8 @@
 
             /* 绑定交互事件 */
 
-            // 开启舞台的DOM事件响应
-            this.stage.enableDOMEvent(Hilo.event.POINTER_START, true);
+            // 开启舞台的DOM事件响应(不开启则无法响应点击和拖拽事件)
+            this.stage.enableDOMEvent([Hilo.event.POINTER_START, Hilo.event.POINTER_MOVE, Hilo.event.POINTER_END], true);
             // 绑定鼠标点下事件
             this.stage.on(Hilo.event.POINTER_START, this.onUserInput.bind(this));
 
@@ -73,7 +74,7 @@
 
         	// 初始化
         	this.initBackground();
-            // this.initTitle();
+            this.initFences();
             this.initObstacles();
             this.initHoodle();
         	// 开始游戏
@@ -110,6 +111,7 @@
     		if(this.state !== 'over') {
                 //设置当前状态为结束over
                 this.state = 'over';
+                this.hoodle.stopRotate();
             }
     	},
     	/* 
@@ -125,28 +127,23 @@
     	        style: {
     	            position: 'absolute',
     	            background: 'url(images/bg.jpg) no-repeat',
-    	            backgroundSize: bgWidth + 'px, ' + bgHeight + 'px',
+    	            backgroundSize: 'cover',
     	            width: bgWidth + 'px',
     	            height: bgHeight + 'px'
     	        }
     	    }), this.stage.canvas);
     	},
         /*
-        *  初始化标题
+        *  初始化栅栏
         */
-        initTitle: function(){
-            // this.title = new Hilo.Text({
-            // 	id: 'title',
-            //     text: '滑稽家族'
-            // }).addTo(this.stage, 0);
-            // // 设置标题样式
-            // var fontSize = 20;
-            // this.title.setFont(fontSize + 'px arial');
-            // this.title.color = '#428bca';
-            // // 设置标题的位置
-            // // 没有渲染之前textWidth为0，所以此处只能自己给值
-            // this.title.x = this.width - fontSize * 4 >> 1;
-            // this.title.y = this.height - fontSize - 2;
+        initFences: function(){
+            this.fences = new game.Fences({
+                id: 'fences',
+                image: this.asset.fence,
+                height: this.height,
+                width: this.width,
+                stageY: this.height
+            }).addTo(this.stage);
         },
         /*
         * 初始化弹珠
@@ -154,10 +151,11 @@
     	initHoodle: function () {
     		this.hoodle = new game.Hoodle({
                 id: 'hoodle',
-                atlas: this.asset.hoodleAtlas,
+                image: this.asset.hoodle,
                 width: 30,
                 height: 30,
-                startX: this.width - 30,
+                startX: this.width - 15,
+                startY: 15,
                 stageX: this.width,
                 stageY: this.height
             }).addTo(this.stage);
@@ -179,12 +177,15 @@
                 return;
             }
 
-            if (this.hoodle && this.hoodle.isStatic && this.hoodle.y !== 0) {
+            if (this.hoodle && this.hoodle.isStatic && this.hoodle.y !== this.hoodle.startY) {
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
-				//	弹珠发生碰撞
+				    //	弹珠发生碰撞       
 				}
+                if (this.fences && this.fences.checkCollision(this.hoodle)) {
+                    //  弹珠发生碰撞
+                }
             }
         }
     };

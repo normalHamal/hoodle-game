@@ -7,7 +7,7 @@
 			// 调用父类构造函数
 	        Obstacles.superclass.constructor.call(this, properties);
 			// 初始化参数
-	        Hilo.copy(this, properties, true);
+	        Hilo.util.copy(this, properties, true);
 	        // 不同颜色障碍物对应的图片位置
 	        this.obstacleImages = [
     			  {color: 'blue',   rect: [0,0,30,30]}
@@ -16,14 +16,14 @@
     			, {color: 'green',  rect: [0,90,30,30]}
     			, {color: 'purple', rect: [0,120,30,30]}
 	    	];
-	    	// 障碍物容器的内边距 (左右边距和上下边距)
-	    	this.paddingX = 36;
-	    	this.paddingY = 84;
-	    	// 障碍物最小间距 (水平间距和垂直间距)
-	    	this.baseSpaceX = 60;
-	    	this.baseSpaceY = 30;
-	    	// 浮动间距最大值 (间距 = 最小间距 + 浮动间距)
-	    	this.floatSpace = 32;
+			// 障碍物容器的内边距 (左右边距和上下边距)
+			this.paddingX   = 36;
+			this.paddingY   = 90;
+			// 障碍物最小间距 (水平间距和垂直间距)
+			this.baseSpaceX = 60;
+			this.baseSpaceY = 40;
+			// 浮动间距最大值 (间距  = 最小间距 + 浮动间距)
+			this.floatSpace = 32;
 	    	
 	    	this.createObstacles(properties.image);
 	    },
@@ -48,9 +48,12 @@
 	    			image: image,
 	    			rect: this.obstacleImages[0 + Math.random() * 4 >> 0].rect
 	    		}).addTo(this);
-
+	    		
 	    		// 设置障碍物的位置
 	    		this.setPosition(obstacle, i);
+	    		//  增加拖拽功能
+	    		Hilo.util.copy(obstacle, Hilo.drag);
+				obstacle.startDrag([this.paddingX, this.paddingY, this.width - 2 * this.paddingX, this.height - 2 * this.paddingY]);
 	    	}
 	    },
 	    /*
@@ -66,12 +69,12 @@
 	    	}
 
 	    	var overflowX = this.startX + obstacle.width + this.paddingX - this.width;
-	    	var overflowY = this.startY + obstacle.height + this.paddingY - this.height;
             if (overflowX > 0) {
                 this.startX = overflowX + this.paddingX;
                 this.startY += this.baseSpaceY + Math.random() * this.floatSpace >> 0;
             }
             // obstacle.x = overflowX > 0 ? (this.startX = overflowX + this.paddingX, this.startY += this.baseSpaceY + Math.random() * this.floatSpace >> 0) : this.startX;
+            var overflowY = this.startY + obstacle.height + this.paddingY - this.height;
             obstacle.x = this.startX;
             obstacle.y = overflowY > 0 ? this.startY - overflowY : this.startY;
 	    },
@@ -93,13 +96,11 @@
 	    *	检测碰撞
 	    */
 	    checkCollision: function (hoodle) {
+	    	if (this.children.length === 0) return;
+	    	
 	    	//  障碍物半径
    			var obstacleRadius = this.children[0].width >> 1;
-   			//  弹珠圆心
-       		var centerHoodle   = {
-       			x: hoodle.x + hoodle.width / 2,
-       			y: hoodle.y + hoodle.height / 2
-       		};
+
        		//  遍历所有障碍物
 	    	for(var i = 0, l = this.children.length; i < l; i += 1) {
 	    		var obstacle = this.children[i];
@@ -108,18 +109,18 @@
 	       			x: obstacle.x + obstacle.width / 2,
 	       			y: obstacle.y + obstacle.height / 2
 	       		};
-	       		//  障碍物中心点和弹珠中心点距离
-       			var distance = Math.sqrt(Math.pow((centerHoodle.x - centerObstacle.x), 2) +
-       					   			Math.pow((centerHoodle.y - centerObstacle.y), 2)) -
+	       		//  障碍物中心点和弹珠中心点距离与两个半径之和的差值
+       			var distance = Math.sqrt(Math.pow((hoodle.x - centerObstacle.x), 2) +
+       					   			Math.pow((hoodle.y - centerObstacle.y), 2)) -
        									(hoodle.radius + obstacleRadius);
        			//	碰撞
 	            if (distance < 0) {
 	            	//  将弹珠定格在碰撞瞬间的位置
-	            	var theta = Math.atan2(hoodle.y - obstacle.y, hoodle.x - obstacle.x);
-	            	hoodle.x += Math.abs(distance) * Math.cos(theta);
+	            	var theta = Math.atan2(hoodle.y - centerObstacle.y, hoodle.x - centerObstacle.x);
+	            	hoodle.x += Math.abs(distance) * Math.cos(theta)
 	            	hoodle.y += Math.abs(distance) * Math.sin(theta);
-
-	            	hoodle.collisionCircle(obstacle, centerObstacle);
+	            	//  弹珠做出反应
+	            	hoodle.collisionCircle(centerObstacle);
 	            	return true;
 	            }
 	        }
