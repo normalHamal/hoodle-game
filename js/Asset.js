@@ -13,10 +13,10 @@
         load: function() {
             // 图片素材列表
             var resources = [
-                {id: 'bg', src: 'images/bg.jpg'},
                 {id: 'hoodle', src: 'images/hoodle.png'},
                 {id: 'obstacles', src: 'images/obstacles.png'},
-                {id: 'fence', src: 'images/fence.png'}
+                {id: 'fence', src: 'images/fence.png'},
+                {id: 'bonus', src: 'images/bonus.png'}
             ];
 
             this.queue = new Hilo.LoadQueue(); // 实例化一个下载队列 
@@ -27,10 +27,10 @@
         // 资源下载完成
         onComplete: function () {
             // 资源下载完成后的Image对象赋值
-			this.bg        = this.queue.get('bg').content;
 			this.obstacles = this.queue.get('obstacles').content;
-			this.hoodle    = this.queue.get('hoodle').content
-			this.fence     = this.queue.get('fence').content
+			this.hoodle    = this.queue.get('hoodle').content;
+			this.fence     = this.queue.get('fence').content;
+			this.bonus     = this.queue.get('bonus').content;
             //删除下载队列的complete事件监听
             this.queue.off('complete');
             //发送complete事件

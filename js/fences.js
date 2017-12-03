@@ -10,17 +10,14 @@
 	        Hilo.util.copy(this, properties, true);
 
 			this.amount          = 6;
-			this.paddingX        = [106, 91, 91, 91, 91, 91, 106];
-			this.startY          = properties.stageY - 50;
-			this.topCircleRadius = 5;
+			this.paddingX        = [52, 51, 51, 51, 51, 51];
+			this.topCircleRadius = 3;
 
 			this.createFences(properties.image);
 	    },
 	    amount: 0,
 	    paddingX: [],
-	    startX: 0,
-	    startY: 0,
-	    stageY: 0,
+	    activeRect: [],
 	    topCircleRadius: 0,
 	    /*
 	    *	创建障碍物
@@ -42,8 +39,8 @@
 	    setPosition: function (fence, index) {
 	    	fence.x = this.paddingX.slice(0, index + 1).reduceRight(function(a, b) {
 			  	return a + b;
-			});
-			fence.y = this.startY;
+			}) + this.activeRect[0];
+			fence.y = this.activeRect[1];
 	    },
 	    /*
 	    *	检测碰撞

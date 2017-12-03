@@ -23,18 +23,16 @@
 	        // 初始化参数
 	        Hilo.util.copy(this, properties, true);
 	        // 设置重力加速度
-	    	this.speedUpY = this.gravity = 0.3;
+	    	this.speedUpY = this.gravity = 0.2;
 	    	//  假设摩擦系数为 0.4
-	    	this.force    = this.gravity * 0.4;
+	    	this.force    = this.gravity * 0.3;
 	    	// 设置弹力变量
-	    	this.bounce   = 0.8;
+	    	this.bounce   = 0.5;
 	    	//  设置弹珠半径中心点
 	    	this.radius = this.pivotX = this.pivotY = this.width >> 1;
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
-	    stageX:  0,     // 舞台的宽度
-	    stageY:  0, 	// 舞台的高度
 	    gravity: 0, 	// 重力加速度
 	    force: 0,		// 水平摩擦力给予小球水平加速度 μg
 	    speedUpX: 0,    // 水平加速度
@@ -44,6 +42,7 @@
 	    moveY: 0,	    // 当前弹珠y轴速度
 	    radius: 0,      // 弹珠半径
 	    isStatic: true, // 弹珠是否已静止
+	    activeRect: [], // 活动范围
 	    /*
 	    *  准备阶段
 	    */
@@ -124,12 +123,14 @@
 	   	*/
 	   	judgeStatic: function () {
 	   		// 判断是否速度为0即静止状态
-	        if (Math.abs(this.moveY) <= this.stageY / 1000) {
+	   		var limit = this.activeRect[3] / 1000;
+
+	        if (Math.abs(this.moveY) <= limit) {
 	        	// 垂直方向静止
 	        	this.moveY = 0;
 	        	// 因为摩擦力存在所以有了水平加速度
 	    		this.speedUpX = this.moveX > 0 ? -this.force : this.force;
-	    		if (Math.abs(this.moveX) <= this.stageY / 1000) {
+	    		if (Math.abs(this.moveX) <= limit) {
 	    			// 弹珠静止
 	    			this.moveX = 0;
 	        		this.isStatic = true;
@@ -151,10 +152,13 @@
 		    var y = this.y + this.moveY;
 		    //   x轴坐标
 		    var x = this.x + this.moveX;
+		    //   弹珠运行界限
+		    var limitY = this.activeRect[1] + this.activeRect[3] - this.pivotY;
+		    var limitX = this.activeRect[0] + this.activeRect[2] - this.pivotX;
 
-		    if(y > this.stageY - this.pivotY) {
+		    if(y > limitY) {
 		        // 弹珠碰触地面
-		        this.y = this.stageY - this.pivotY;
+		        this.y = limitY;
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
@@ -163,9 +167,9 @@
 				this.y = y;
 		    }
 
-		    if (x < 0 + this.pivotX || x > this.stageX - this.pivotX) {
+		    if (x < this.activeRect[0] + this.pivotX || x > limitX) {
 		    	// 弹珠触碰墙壁
-	    		this.x      = x < this.pivotX ? this.pivotX : this.stageX - this.pivotX;
+	    		this.x = x > limitX ? limitX : this.activeRect[0] + this.pivotX;
 	    		this.collisionSquare('side');
 	    	} else {
 	    		// 弹珠没有触碰墙壁

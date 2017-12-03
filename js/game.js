@@ -13,10 +13,10 @@
         stage: null,     // 舞台对象
         ticker: null,    // 定时器
         state: null,     // 游戏状态
-        bg: null,        // 背景
         hoodle: null,    // 弹珠
         obstacles: null, // 障碍物集合
         fences: null,    // 栅栏
+        bonus: null,     // 奖励
 
         init: function () {
         	this.asset = new game.Asset();
@@ -75,6 +75,7 @@
         	// 初始化
         	this.initBackground();
             this.initFences();
+            this.initBonus();
             this.initObstacles();
             this.initHoodle();
         	// 开始游戏
@@ -126,7 +127,7 @@
     	        id: 'bg',
     	        style: {
     	            position: 'absolute',
-    	            background: 'url(images/bg.jpg) no-repeat',
+    	            background: 'url(images/bg.png) no-repeat',
     	            backgroundSize: 'cover',
     	            width: bgWidth + 'px',
     	            height: bgHeight + 'px'
@@ -136,14 +137,23 @@
         /*
         *  初始化栅栏
         */
-        initFences: function(){
+        initFences: function () {
             this.fences = new game.Fences({
                 id: 'fences',
                 image: this.asset.fence,
-                height: this.height,
-                width: this.width,
-                stageY: this.height
+                height: 34,
+                width: 368,
+                activeRect: [118, 294, 368, 34]
             }).addTo(this.stage);
+        },
+        initBonus: function () {
+        	this.bonus = new game.Bonus({
+        		id: 'bouns',
+        		image: this.asset.bonus,
+        		height: 50,
+        		width: 368,
+        		activeRect: [118, 278, 368, 50]
+        	}).addTo(this.stage);
         },
         /*
         * 初始化弹珠
@@ -152,12 +162,11 @@
     		this.hoodle = new game.Hoodle({
                 id: 'hoodle',
                 image: this.asset.hoodle,
-                width: 18,
-                height: 18,
-                startX: this.width - 9,
-                startY: 9,
-                stageX: this.width,
-                stageY: this.height
+                width: 14,
+                height: 14,
+                startX: 443,
+                startY: 89,
+                activeRect: [118, 65, 368, 263]
             }).addTo(this.stage);
     	},
         /*
@@ -167,8 +176,9 @@
             this.obstacles = new game.Obstacles({
                 id: 'obstacles',
                 image: this.asset.obstacles,
-                height: this.height,
-                width: this.width,
+                height: 263,
+                width: 368,
+                activeRect: [118, 65, 348, 193],
                 amount: 22,
             }).addTo(this.stage);
         },
