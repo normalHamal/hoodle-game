@@ -24,10 +24,10 @@
 	        Hilo.util.copy(this, properties, true);
 	        // 设置重力加速度
 	    	this.speedUpY = this.gravity = 0.2;
-	    	//  假设摩擦系数为 0.4
+	    	//  假设摩擦系数为 0.3
 	    	this.force    = this.gravity * 0.3;
 	    	// 设置弹力变量
-	    	this.bounce   = 0.5;
+	    	this.bounce   = 0.6;
 	    	//  设置弹珠半径中心点
 	    	this.radius = this.pivotX = this.pivotY = this.width >> 1;
 	    },

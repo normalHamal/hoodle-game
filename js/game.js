@@ -17,6 +17,9 @@
         obstacles: null, // 障碍物集合
         fences: null,    // 栅栏
         bonus: null,     // 奖励
+        btn: null,       // 发射按钮
+        gameReadyScene: null,
+        gameOverScene: null,
 
         init: function () {
         	this.asset = new game.Asset();
@@ -61,25 +64,13 @@
 
             // 开启舞台的DOM事件响应(不开启则无法响应点击和拖拽事件)
             this.stage.enableDOMEvent([Hilo.event.POINTER_START, Hilo.event.POINTER_MOVE, Hilo.event.POINTER_END], true);
-            // 绑定鼠标点下事件
-            this.stage.on(Hilo.event.POINTER_START, this.onUserInput.bind(this));
-
-            //Space键控制
-            document.addEventListener('keydown', function(e){
-                if(e.keyCode === 32) this.onUserInput(e);
-            }.bind(this));
 
             //绑定舞台更新事件
         	this.stage.onUpdate = this.onUpdate.bind(this);
 
         	// 初始化
         	this.initBackground();
-            this.initFences();
-            this.initBonus();
-            this.initObstacles();
-            this.initHoodle();
-        	// 开始游戏
-        	this.gameReady();
+            this.initScenes();
     	},
         /*
         *   鼠标输入
@@ -102,6 +93,12 @@
         *   开始游戏
         */
     	gameReady: function () {
+            this.initFences();
+            this.initBonus();
+            this.initObstacles();
+            this.initHoodle();
+            this.initButton();
+
     		this.state = 'start';
             this.hoodle.getReady();
     	},
@@ -113,6 +110,11 @@
                 //设置当前状态为结束over
                 this.state = 'over';
                 this.hoodle.stopRotate();
+                //显示结束场景
+                if (!this.stage.contains(this.gameOverScene)) {
+                    this.stage.addChild(this.gameOverScene);  
+                }
+                this.gameOverScene.show();
             }
     	},
     	/* 
@@ -134,6 +136,45 @@
     	        }
     	    }), this.stage.canvas);
     	},
+        /**
+         * 初始化场景
+         */
+        initScenes: function () {
+            //准备场景
+            this.gameReadyScene = new game.ReadyScene({
+                width: this.width,
+                height: 328,
+                image: this.asset.ready
+            }).addTo(this.stage);
+
+            //结束场景
+            this.gameOverScene = new game.OverScene({
+                width: this.width,
+                height: this.height,
+                image: this.asset.over,
+                visible: false
+            });
+
+            //绑定开始按钮事件
+            this.gameReadyScene.getChildById('start').on(Hilo.event.POINTER_START, function (e) {
+                e._stopped = true;
+                this.gameReadyScene.hide(function () {
+                    this.gameReady();
+                }.bind(this));
+            }.bind(this));
+
+            //绑定重新开始事件
+            this.gameOverScene.getChildById('over').on(Hilo.event.POINTER_START, function (e) {
+                e._stopped = true;
+                // 重新开始
+                this.gameOverScene.visible = false;
+                this.destory();
+                this.initScenes();
+            }.bind(this));
+
+            //显示准备场景
+            this.gameReadyScene.visible = true;
+        },
         /*
         *  初始化栅栏
         */
@@ -182,6 +223,19 @@
                 amount: 22,
             }).addTo(this.stage);
         },
+        /**
+         * 初始化发射按钮
+         */
+        initButton: function () {
+            this.btn = new Hilo.Button({
+                id: 'btn',
+                x: 540,
+                y: 229,
+                image: this.asset.button
+            }).addTo(this.stage);
+            // 绑定鼠标点下事件
+            this.btn.on(Hilo.event.POINTER_START, this.onUserInput.bind(this));
+        },
     	onUpdate: function () {
             if (this.state === 'ready') {
                 return;
@@ -197,6 +251,9 @@
                     //  弹珠发生碰撞
                 }
             }
+        },
+        destory: function () {
+            this.stage.removeAllChildren();
         }
     };
 })(window)
