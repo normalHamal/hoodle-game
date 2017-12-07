@@ -31,7 +31,7 @@
         onComplete: function () {
             // 资源下载完成后的Image对象赋值
             this.ready     = this.queue.get('ready').content;
-            this.over     = this.queue.get('over').content;
+            this.over      = this.queue.get('over').content;
 			this.obstacles = this.queue.get('obstacles').content;
 			this.hoodle    = this.queue.get('hoodle').content;
 			this.fence     = this.queue.get('fence').content;

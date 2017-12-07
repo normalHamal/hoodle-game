@@ -97,7 +97,7 @@
 	    *	检测碰撞
 	    */
 	    checkCollision: function (hoodle) {
-	    	if (this.children.length === 0) return;
+	    	if (this.children.length === 0) return false;
 	    	
 	    	//  障碍物半径
    			var obstacleRadius = this.children[0].width >> 1;

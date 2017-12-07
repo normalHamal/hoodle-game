@@ -87,6 +87,22 @@
 
 			bonus.x = x + offsetLeft;
 			bonus.y = y;
+	    },
+	    /**
+	     *   获取最终弹珠落入哪个奖励中
+	     */
+	    getOverBonus: function (hoodle) {
+	    	if (this.children.length === 0 || !hoodle) return null;
+
+	    	for(var i = 0, l = this.children.length; i < l; i += 1) {
+	    		var bonus = this.children[i];
+
+	    		if (hoodle.hitTestObject(bonus, true)) {
+	    			return this.bonusArray[i].color;
+	    		}
+	    	}
+
+	    	return null;
 	    }
 	});
 })(window.game)

@@ -4,6 +4,7 @@
 var ReadyScene = ns.ReadyScene = Hilo.Class.create({
     Extends: Hilo.Container,
     constructor: function (properties) {
+        properties = properties || {};
         ReadyScene.superclass.constructor.call(this, properties);
         this.init(properties);
     },

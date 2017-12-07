@@ -114,7 +114,7 @@
                 if (!this.stage.contains(this.gameOverScene)) {
                     this.stage.addChild(this.gameOverScene);  
                 }
-                this.gameOverScene.show();
+                this.gameOverScene.show(this.bonus.getOverBonus(this.hoodle));
             }
     	},
     	/* 
