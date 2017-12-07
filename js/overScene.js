@@ -19,13 +19,9 @@ var OverScene = ns.OverScene = Hilo.Class.create({
     overImages: [],
 
     init: function (properties) {
-        this.removeAllChildren();
-
-        //  准备场景（其实就是加块挡板）
+        //  结束发奖励场景
         var over = new Hilo.Bitmap({
-            id: 'over',
-            image: properties.image,
-            rect: properties.rect
+            id: 'over'
         });
 
         this.addChild(over);
@@ -40,10 +36,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
                 index = i;
             }
         });
-        this.init({
-            image: this.image,
-            rect: this.overImages[index].rect
-        })
+
+        this.getChildById('over').setImage(this.image, this.overImages[index].rect);
             
 
         Hilo.Tween.from(this.getChildById('over'), {alpha:0}, {

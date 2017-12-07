@@ -79,14 +79,9 @@
     		if(this.state === 'start') {
                 this.hoodle.startDown()
                 this.state = 'playing';
-            } else if (this.state === 'over') {
+            }
+            if (this.state === 'over') {
                 this.gameReady();
-            } else if (this.state === 'playing') {
-            	this.ticker.pause();
-            	this.state = 'pause';
-            } else {
-            	this.ticker.resume();
-            	this.state = 'playing';
             }
     	},
         /*
