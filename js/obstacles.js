@@ -128,4 +128,4 @@
 	        return false;
 	    }
 	});
-})(window.game)
+})(window.game);

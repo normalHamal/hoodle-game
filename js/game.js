@@ -251,4 +251,4 @@
             this.stage.removeAllChildren();
         }
     };
-})(window)
+})(window);

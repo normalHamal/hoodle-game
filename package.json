@@ -1,0 +1,15 @@
+{
+  "name": "hoodle-game",
+  "version": "4.0",
+  "description": "a canvas game create by Game Engine Hilo",
+  "scripts": {
+    "gulp": "gulp minJs"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-notify": "^3.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0"
+  }
+}

@@ -177,4 +177,4 @@
 	    	}
 		}
 	});
-})(window.game)
+})(window.game);

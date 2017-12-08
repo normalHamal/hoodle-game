@@ -43,4 +43,4 @@
             this.fire('complete');
         }
     });
-})(window.game)
+})(window.game);

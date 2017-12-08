@@ -105,4 +105,4 @@
 	    	return null;
 	    }
 	});
-})(window.game)
+})(window.game);
