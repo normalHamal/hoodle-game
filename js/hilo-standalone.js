@@ -2,6 +2,12 @@
  * Hilo 1.1.4 for standalone
  * Copyright 2016 alibaba.com
  * Licensed under the MIT License
+ * 
+ * 2017/12/8 update by normalHamal
+ * changed Graphics's method drawCircle
+ * drawCircle's arguments 
+ * from (x:Number, y:Number, radius:Number) 
+ * to (x:Number, y:Number, radius:Number, startAngle:Number, endAngle:Number, anticlockwise:Boolean)
  */
 (function(window){
 if(!window.Hilo) window.Hilo = {};
@@ -4095,10 +4101,13 @@ return Class.create(/** @lends Graphics.prototype */{
      * @param {Number} x The x-coordinate value.
      * @param {Number} y The y-coordinate value.
      * @param {Number} radius The radius of the circle.
+     * @param {Number} startAngle The angle to draw begin.
+     * @param {Number} endAngle The angle to draw end.
+     * @param {Boolean} anticlockwise whether draw clockwise.
      * @returns {Graphics} The Graphics Object.
      */
-    drawCircle: function(x, y, radius){
-        return this._addAction(['arc', x + radius, y + radius, radius, 0, Math.PI * 2, 0]);
+    drawCircle: function(x, y, radius, startAngle, endAngle, anticlockwise){
+        return this._addAction(['arc', x + radius, y + radius, radius, startAngle, endAngle, anticlockwise]);
     },
 
     /**
@@ -4112,7 +4121,7 @@ return Class.create(/** @lends Graphics.prototype */{
      */
     drawEllipse: function(x, y, width, height){
         var me = this;
-        if(width == height) return me.drawCircle(x, y, width);
+        if(width == height) return me.drawCircle(x, y, width, 0, Math.PI * 2, false);
 
         var addAction = me._addAction;
         var w = width / 2, h = height / 2, C = 0.5522847498307933, cx = C * w, cy = C * h;

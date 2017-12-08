@@ -2,6 +2,12 @@
  * Hilo 1.1.4 for standalone
  * Copyright 2016 alibaba.com
  * Licensed under the MIT License
+ * 
+ * 2017/12/8 update by normalHamal
+ * changed Graphics's method drawCircle
+ * drawCircle's arguments 
+ * from (x:Number, y:Number, radius:Number) 
+ * to (x:Number, y:Number, radius:Number, startAngle:Number, endAngle:Number, anticlockwise:Boolean)
  */
 (function(window){
 if(!window.Hilo) window.Hilo = {};
@@ -4095,10 +4101,13 @@ return Class.create(/** @lends Graphics.prototype */{
      * @param {Number} x The x-coordinate value.
      * @param {Number} y The y-coordinate value.
      * @param {Number} radius The radius of the circle.
+     * @param {Number} startAngle The angle to draw begin.
+     * @param {Number} endAngle The angle to draw end.
+     * @param {Boolean} anticlockwise whether draw clockwise.
      * @returns {Graphics} The Graphics Object.
      */
-    drawCircle: function(x, y, radius){
-        return this._addAction(['arc', x + radius, y + radius, radius, 0, Math.PI * 2, 0]);
+    drawCircle: function(x, y, radius, startAngle, endAngle, anticlockwise){
+        return this._addAction(['arc', x + radius, y + radius, radius, startAngle, endAngle, anticlockwise]);
     },
 
     /**
@@ -4112,7 +4121,7 @@ return Class.create(/** @lends Graphics.prototype */{
      */
     drawEllipse: function(x, y, width, height){
         var me = this;
-        if(width == height) return me.drawCircle(x, y, width);
+        if(width == height) return me.drawCircle(x, y, width, 0, Math.PI * 2, false);
 
         var addAction = me._addAction;
         var w = width / 2, h = height / 2, C = 0.5522847498307933, cx = C * w, cy = C * h;
@@ -7910,6 +7919,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
         fences: null,    // 栅栏
         bonus: null,     // 奖励
         btn: null,       // 发射按钮
+        progress: null,  // 进度条
         gameReadyScene: null,
         gameOverScene: null,
 
@@ -7968,12 +7978,13 @@ window.Hilo.ParticleSystem = ParticleSystem;
         *   鼠标输入
         */
     	onUserInput: function () {
-    		if(this.state === 'start') {
-                this.hoodle.startDown()
+    		if (this.state === 'start') {
+                this.progress.play();
                 this.state = 'playing';
-            }
-            if (this.state === 'over') {
-                this.gameReady();
+            } else if (this.state === 'playing') {
+                this.progress.stop(function (ratio) {
+                    this.hoodle.startDown(ratio);
+                }.bind(this));
             }
     	},
         /*
@@ -7984,6 +7995,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
             this.initBonus();
             this.initObstacles();
             this.initHoodle();
+            this.initProgress(); // 必须初始化在button前面，不然buttondepth太低会无法点击
             this.initButton();
 
     		this.state = 'start';
@@ -8063,7 +8075,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
             this.gameReadyScene.visible = true;
         },
         /*
-        *  初始化栅栏
+        * 初始化栅栏
         */
         initFences: function () {
             this.fences = new game.Fences({
@@ -8098,7 +8110,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
             }).addTo(this.stage);
     	},
         /*
-        *  初始化障碍物
+        * 初始化障碍物
         */
         initObstacles: function () {
             this.obstacles = new game.Obstacles({
@@ -8122,6 +8134,17 @@ window.Hilo.ParticleSystem = ParticleSystem;
             }).addTo(this.stage);
             // 绑定鼠标点下事件
             this.btn.on(Hilo.event.POINTER_START, this.onUserInput.bind(this));
+        },
+        /**
+         * 初始化进度条
+         */
+        initProgress: function () {
+            this.progress = new game.Progress({
+                width: 80,
+                height: 80,
+                x:533,
+                y:221
+            }).addTo(this.stage);
         },
     	onUpdate: function () {
             if (this.state === 'ready') {
@@ -8310,14 +8333,11 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	        Hoodle.superclass.constructor.call(this, properties);
 	        // 初始化参数
 	        Hilo.util.copy(this, properties, true);
-	        // 设置重力加速度
-	    	this.speedUpY = this.gravity = 0.2;
-	    	//  假设摩擦系数为 0.3
-	    	this.force    = this.gravity * 0.3;
-	    	// 设置弹力变量
-	    	this.bounce   = 0.6;
-	    	//  设置弹珠半径中心点
-	    	this.radius = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.speedUpY  = this.gravity = 0.2;
+	    	this.force     = this.gravity * 0.3;
+	    	this.bounce    = 0.6;
+	    	this.radius    = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.moveRange = [-16, -1];
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
@@ -8328,6 +8348,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    bounce: 0,      // 弹力变量
 	    moveX: 0, 		// 当前弹珠x轴速度
 	    moveY: 0,	    // 当前弹珠y轴速度
+	    moveRange: [],  // 弹珠初始速度范围
 	    radius: 0,      // 弹珠半径
 	    isStatic: true, // 弹珠是否已静止
 	    activeRect: [], // 活动范围
@@ -8339,7 +8360,6 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	        this.x        = this.startX;
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
-	        this.moveX    = -6;
 	        this.moveY    = 0;
 	        this.startRotate(6000, 360, true)
 		},
@@ -8351,7 +8371,6 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	        angle = angle || 360;
 	        me.rotation = 0;
 	        me.rotateTween = Hilo.Tween.to(me, {rotation:angle}, {time:time, loop:loop});
-	        return me;
 	    },
 	    stopRotate: function () {
 	        var me = this;
@@ -8359,14 +8378,14 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	            me.rotateTween.stop();
 	            me.rotateTween = null;
 	        }
-	        return me;
 	    },
 		/*
 		*  开始下落
 		*/
-		startDown: function () {
+		startDown: function (ratio) {
 			// 恢复弹珠状态
 			this.isStatic = false;
+			this.moveX = this.moveRange[1] + (this.moveRange[0] - this.moveRange[1]) * ratio;
 		},
 		/**
 		*  碰撞反弹 (针对方形)
@@ -8444,12 +8463,15 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 		    var limitY = this.activeRect[1] + this.activeRect[3] - this.pivotY;
 		    var limitX = this.activeRect[0] + this.activeRect[2] - this.pivotX;
 
-		    if(y > limitY) {
+		    if (y > limitY) {
 		        // 弹珠碰触地面
 		        this.y = limitY;
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
+		    } else if (y < this.activeRect[1]) {
+		    	this.y = this.activeRect[1];
+		    	this.collisionSquare('top');
 		    } else {
 		    	// 弹珠没有碰到地面
 				this.y = y;
@@ -8802,6 +8824,68 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    	}
 
 	    	return null;
+	    }
+	});
+})(window.game);
+(function (ns) {
+	var Progress = ns.Progress = Hilo.Class.create({
+		Extends: Hilo.Graphics,
+
+		constructor: function(properties) {
+			properties = properties || {};
+			// 调用父类构造函数
+	        Progress.superclass.constructor.call(this, properties);
+	        this.startAngle = - Math.PI * 9 / 10;
+	        this.endAngle   = - Math.PI * 1 / 10;
+	        this.angleRange = this.endAngle - this.startAngle;
+
+			this.init();
+	    },
+	    startAngle: 0,
+	    endAngle: 0,
+	    nowAngle: 0,
+	    rotating: false,
+	    angleRange: 0,
+	    /**
+	     * 初始化进度条位置为0
+	     */
+	    init: function () {
+	    	this.nowAngle = this.startAngle;
+
+	    	this.draw();
+	    },
+	    draw: function () {
+	    	this.lineStyle(4, "#6dabcf")
+                .drawCircle(0, 0, 40, this.startAngle, this.nowAngle, false)
+                .endFill();
+	    },
+	    play: function () {
+	    	this.rotating = true;
+	    },
+	    stop: function (cb) {
+	    	if (this.rotating) {
+	    		this.rotating = false;
+	    	}
+	    	if (!cb) return;
+
+	    	cb((this.nowAngle - this.startAngle) / Math.abs(this.angleRange));
+	    },
+	    onUpdate: function () {
+	    	if (!this.rotating) return;
+
+	    	this.clear();
+
+	    	this.nowAngle += 0.01 * this.angleRange;
+
+	    	if (this.angleRange > 0 && this.nowAngle >= this.endAngle) {
+	    		this.nowAngle = this.endAngle;
+	    		this.angleRange *= -1;
+	    	} else if (this.angleRange < 0 && this.nowAngle <= this.startAngle) {
+	    		this.nowAngle = this.startAngle;
+	    		this.angleRange *= -1;
+	    	}
+
+	    	this.draw();
 	    }
 	});
 })(window.game);

@@ -14,7 +14,8 @@ gulp.task('minJs', function () {
 			'js/hoodle.js',
 			'js/obstacles.js',
 			'js/fences.js',
-			'js/bonus.js'
+			'js/bonus.js',
+			'js/progress.js'
 		])
        .pipe(concat('main.js'))   //合并js
        .pipe(gulp.dest('dist/js'))       //输出

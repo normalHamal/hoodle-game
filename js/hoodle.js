@@ -22,14 +22,11 @@
 	        Hoodle.superclass.constructor.call(this, properties);
 	        // 初始化参数
 	        Hilo.util.copy(this, properties, true);
-	        // 设置重力加速度
-	    	this.speedUpY = this.gravity = 0.2;
-	    	//  假设摩擦系数为 0.3
-	    	this.force    = this.gravity * 0.3;
-	    	// 设置弹力变量
-	    	this.bounce   = 0.6;
-	    	//  设置弹珠半径中心点
-	    	this.radius = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.speedUpY  = this.gravity = 0.2;
+	    	this.force     = this.gravity * 0.3;
+	    	this.bounce    = 0.6;
+	    	this.radius    = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.moveRange = [-16, -1];
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
@@ -40,6 +37,7 @@
 	    bounce: 0,      // 弹力变量
 	    moveX: 0, 		// 当前弹珠x轴速度
 	    moveY: 0,	    // 当前弹珠y轴速度
+	    moveRange: [],  // 弹珠初始速度范围
 	    radius: 0,      // 弹珠半径
 	    isStatic: true, // 弹珠是否已静止
 	    activeRect: [], // 活动范围
@@ -51,7 +49,6 @@
 	        this.x        = this.startX;
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
-	        this.moveX    = -6;
 	        this.moveY    = 0;
 	        this.startRotate(6000, 360, true)
 		},
@@ -63,7 +60,6 @@
 	        angle = angle || 360;
 	        me.rotation = 0;
 	        me.rotateTween = Hilo.Tween.to(me, {rotation:angle}, {time:time, loop:loop});
-	        return me;
 	    },
 	    stopRotate: function () {
 	        var me = this;
@@ -71,14 +67,14 @@
 	            me.rotateTween.stop();
 	            me.rotateTween = null;
 	        }
-	        return me;
 	    },
 		/*
 		*  开始下落
 		*/
-		startDown: function () {
+		startDown: function (ratio) {
 			// 恢复弹珠状态
 			this.isStatic = false;
+			this.moveX = this.moveRange[1] + (this.moveRange[0] - this.moveRange[1]) * ratio;
 		},
 		/**
 		*  碰撞反弹 (针对方形)
@@ -156,12 +152,15 @@
 		    var limitY = this.activeRect[1] + this.activeRect[3] - this.pivotY;
 		    var limitX = this.activeRect[0] + this.activeRect[2] - this.pivotX;
 
-		    if(y > limitY) {
+		    if (y > limitY) {
 		        // 弹珠碰触地面
 		        this.y = limitY;
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
+		    } else if (y < this.activeRect[1]) {
+		    	this.y = this.activeRect[1];
+		    	this.collisionSquare('top');
 		    } else {
 		    	// 弹珠没有碰到地面
 				this.y = y;

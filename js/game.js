@@ -18,6 +18,7 @@
         fences: null,    // 栅栏
         bonus: null,     // 奖励
         btn: null,       // 发射按钮
+        progress: null,  // 进度条
         gameReadyScene: null,
         gameOverScene: null,
 
@@ -76,12 +77,13 @@
         *   鼠标输入
         */
     	onUserInput: function () {
-    		if(this.state === 'start') {
-                this.hoodle.startDown()
+    		if (this.state === 'start') {
+                this.progress.play();
                 this.state = 'playing';
-            }
-            if (this.state === 'over') {
-                this.gameReady();
+            } else if (this.state === 'playing') {
+                this.progress.stop(function (ratio) {
+                    this.hoodle.startDown(ratio);
+                }.bind(this));
             }
     	},
         /*
@@ -92,6 +94,7 @@
             this.initBonus();
             this.initObstacles();
             this.initHoodle();
+            this.initProgress(); // 必须初始化在button前面，不然buttondepth太低会无法点击
             this.initButton();
 
     		this.state = 'start';
@@ -171,7 +174,7 @@
             this.gameReadyScene.visible = true;
         },
         /*
-        *  初始化栅栏
+        * 初始化栅栏
         */
         initFences: function () {
             this.fences = new game.Fences({
@@ -206,7 +209,7 @@
             }).addTo(this.stage);
     	},
         /*
-        *  初始化障碍物
+        * 初始化障碍物
         */
         initObstacles: function () {
             this.obstacles = new game.Obstacles({
@@ -230,6 +233,17 @@
             }).addTo(this.stage);
             // 绑定鼠标点下事件
             this.btn.on(Hilo.event.POINTER_START, this.onUserInput.bind(this));
+        },
+        /**
+         * 初始化进度条
+         */
+        initProgress: function () {
+            this.progress = new game.Progress({
+                width: 80,
+                height: 80,
+                x:533,
+                y:221
+            }).addTo(this.stage);
         },
     	onUpdate: function () {
             if (this.state === 'ready') {
