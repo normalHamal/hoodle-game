@@ -8147,7 +8147,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
             }).addTo(this.stage);
         },
     	onUpdate: function () {
-            if (this.state === 'ready') {
+            if (this.state === 'start') {
                 return;
             }
 
