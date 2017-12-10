@@ -73,8 +73,8 @@
 		iframe.scrolling = 'auto';
 		var parent       = document.getElementById('game-in-iphone');
 
-		if (iframe.attachEvent){
-		    iframe.attachEvent("onload", function(){
+		if (iframe.attachEvent) {
+		    iframe.attachEvent("onload", function () {
 		        iframe.className = 'show';
 		    });
 		} else {
