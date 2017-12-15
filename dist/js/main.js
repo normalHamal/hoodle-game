@@ -7984,6 +7984,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
             } else if (this.state === 'playing') {
                 this.progress.stop(function (ratio) {
                     this.hoodle.startDown(ratio);
+                    this.btn.setEnabled(false); // 禁用button
                 }.bind(this));
             }
     	},
@@ -8058,7 +8059,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
             this.gameReadyScene.getChildById('start').on(Hilo.event.POINTER_START, function (e) {
                 e._stopped = true;
                 this.gameReadyScene.hide(function () {
-                    this.gameReady();
+                    this.state !== 'start' && this.gameReady();
                 }.bind(this));
             }.bind(this));
 
@@ -8155,7 +8156,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
-				    //	弹珠发生碰撞       
+				    //	弹珠发生碰撞    
 				}
                 if (this.fences && this.fences.checkCollision(this.hoodle)) {
                     //  弹珠发生碰撞
@@ -8335,9 +8336,12 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	        Hilo.util.copy(this, properties, true);
 	    	this.speedUpY  = this.gravity = 0.2;
 	    	this.force     = this.gravity * 0.3;
-	    	this.bounce    = 0.6;
+	    	this.bounceSquare   = 0.4;
+	    	this.bounceCircle   = 0.7;
 	    	this.radius    = this.pivotX = this.pivotY = this.width >> 1;
 	    	this.moveRange = [-16, -1];
+	    	this.x         = this.startX;
+	        this.y         = this.startY;
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
@@ -8345,7 +8349,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    force: 0,		// 水平摩擦力给予小球水平加速度 μg
 	    speedUpX: 0,    // 水平加速度
 	    speedUpY: 0,    // 垂直加速度
-	    bounce: 0,      // 弹力变量
+	    bounceSquare: 0,// 弹力变量(针对方形)
+	    bounceCircle: 0,// 弹力变量(针对圆形)
 	    moveX: 0, 		// 当前弹珠x轴速度
 	    moveY: 0,	    // 当前弹珠y轴速度
 	    moveRange: [],  // 弹珠初始速度范围
@@ -8393,10 +8398,10 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 		collisionSquare: function (direction) {
 			if (['left', 'right', 'side'].some(function (i) { return i === direction; })) {
 				// 速度反向并减少
-				this.moveX *= this.bounce * -1;
+				this.moveX *= this.bounceSquare * -1;
 			} else {
 				// 速度反向并减少
-		        this.moveY *= this.bounce * -1;
+		        this.moveY *= this.bounceSquare * -1;
 			}
 		},
 		/*
@@ -8420,8 +8425,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
    			//  反弹
    			speed = reflectVector(speed, normal);
 
-   			this.moveX = speed.x * this.bounce;
-   			this.moveY = speed.y * this.bounce;
+   			this.moveX = speed.x * this.bounceCircle;
+   			this.moveY = speed.y * this.bounceCircle;
    			
    			// this.judgeStatic();
        	},
@@ -8552,7 +8557,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    	// startX += index === 0 ? this.paddingX + Math.random() * 32 >> 0 : 60 + Math.random() * 32 >> 0;
 	    	if (index === 0) {
 	    		this.startX = this.floatSpace + Math.random() * this.paddingX >> 0;
-	    		this.startY = this.floatSpace + Math.random() * this.paddingY >> 0;
+	    		this.startY = this.floatSpace + 20 + Math.random() * this.paddingY >> 0;
 	    	} else {
 	    		this.startX += this.baseSpace + Math.random() * this.floatSpace >> 0;
 	    	}
@@ -8875,7 +8880,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 
 	    	this.clear();
 
-	    	this.nowAngle += 0.01 * this.angleRange;
+	    	this.nowAngle += 0.02 * this.angleRange;
 
 	    	if (this.angleRange > 0 && this.nowAngle >= this.endAngle) {
 	    		this.nowAngle = this.endAngle;
