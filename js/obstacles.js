@@ -62,7 +62,7 @@
 	    	// startX += index === 0 ? this.paddingX + Math.random() * 32 >> 0 : 60 + Math.random() * 32 >> 0;
 	    	if (index === 0) {
 	    		this.startX = this.floatSpace + Math.random() * this.paddingX >> 0;
-	    		this.startY = this.floatSpace + Math.random() * this.paddingY >> 0;
+	    		this.startY = this.floatSpace + 20 + Math.random() * this.paddingY >> 0;
 	    	} else {
 	    		this.startX += this.baseSpace + Math.random() * this.floatSpace >> 0;
 	    	}

@@ -83,6 +83,7 @@
             } else if (this.state === 'playing') {
                 this.progress.stop(function (ratio) {
                     this.hoodle.startDown(ratio);
+                    this.btn.setEnabled(false); // 禁用button
                 }.bind(this));
             }
     	},
@@ -157,7 +158,7 @@
             this.gameReadyScene.getChildById('start').on(Hilo.event.POINTER_START, function (e) {
                 e._stopped = true;
                 this.gameReadyScene.hide(function () {
-                    this.gameReady();
+                    this.state !== 'start' && this.gameReady();
                 }.bind(this));
             }.bind(this));
 
@@ -254,7 +255,7 @@
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
-				    //	弹珠发生碰撞       
+				    //	弹珠发生碰撞    
 				}
                 if (this.fences && this.fences.checkCollision(this.hoodle)) {
                     //  弹珠发生碰撞

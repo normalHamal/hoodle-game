@@ -46,7 +46,7 @@
 
 	    	this.clear();
 
-	    	this.nowAngle += 0.01 * this.angleRange;
+	    	this.nowAngle += 0.02 * this.angleRange;
 
 	    	if (this.angleRange > 0 && this.nowAngle >= this.endAngle) {
 	    		this.nowAngle = this.endAngle;

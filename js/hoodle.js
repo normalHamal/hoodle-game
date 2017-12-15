@@ -24,9 +24,12 @@
 	        Hilo.util.copy(this, properties, true);
 	    	this.speedUpY  = this.gravity = 0.2;
 	    	this.force     = this.gravity * 0.3;
-	    	this.bounce    = 0.6;
+	    	this.bounceSquare   = 0.4;
+	    	this.bounceCircle   = 0.7;
 	    	this.radius    = this.pivotX = this.pivotY = this.width >> 1;
 	    	this.moveRange = [-16, -1];
+	    	this.x         = this.startX;
+	        this.y         = this.startY;
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
@@ -34,7 +37,8 @@
 	    force: 0,		// 水平摩擦力给予小球水平加速度 μg
 	    speedUpX: 0,    // 水平加速度
 	    speedUpY: 0,    // 垂直加速度
-	    bounce: 0,      // 弹力变量
+	    bounceSquare: 0,// 弹力变量(针对方形)
+	    bounceCircle: 0,// 弹力变量(针对圆形)
 	    moveX: 0, 		// 当前弹珠x轴速度
 	    moveY: 0,	    // 当前弹珠y轴速度
 	    moveRange: [],  // 弹珠初始速度范围
@@ -82,10 +86,10 @@
 		collisionSquare: function (direction) {
 			if (['left', 'right', 'side'].some(function (i) { return i === direction; })) {
 				// 速度反向并减少
-				this.moveX *= this.bounce * -1;
+				this.moveX *= this.bounceSquare * -1;
 			} else {
 				// 速度反向并减少
-		        this.moveY *= this.bounce * -1;
+		        this.moveY *= this.bounceSquare * -1;
 			}
 		},
 		/*
@@ -109,8 +113,8 @@
    			//  反弹
    			speed = reflectVector(speed, normal);
 
-   			this.moveX = speed.x * this.bounce;
-   			this.moveY = speed.y * this.bounce;
+   			this.moveX = speed.x * this.bounceCircle;
+   			this.moveY = speed.y * this.bounceCircle;
    			
    			// this.judgeStatic();
        	},
