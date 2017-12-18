@@ -264,7 +264,7 @@
                 return;
             }
 
-            if (this.hoodle && this.hoodle.isStatic && this.hoodle.y !== this.hoodle.startY) {
+            if (this.hoodle && this.hoodle.end) {
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {

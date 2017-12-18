@@ -22,7 +22,9 @@
 	     */
 	    init: function () {
 	    	this.nowAngle = this.startAngle;
+	    	this.rotating  = false;
 
+	    	this.clear();
 	    	this.draw();
 	    },
 	    draw: function () {

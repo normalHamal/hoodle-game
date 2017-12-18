@@ -8165,7 +8165,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
                 return;
             }
 
-            if (this.hoodle && this.hoodle.isStatic && this.hoodle.y !== this.hoodle.startY) {
+            if (this.hoodle && this.hoodle.end) {
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
@@ -8292,6 +8292,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
             , {color: 'red',    rect: [0, 750, 667, 375]}
             , {color: 'blue',   rect: [0, 375, 667, 375]}
             , {color: 'green',  rect: [0, 0, 667, 375]}
+            , {rect: [0, 1500, 667, 375]}
         ];
         this.image = properties.image;
         this.init(properties);
@@ -8310,7 +8311,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 
     show: function (color) {
         this.visible = true;
-        var index    = 0;
+        var index    = 4;
 
         this.overImages.forEach(function (o, i) {
             if (o.color === color) {
@@ -8319,8 +8320,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
         });
 
         this.getChildById('over').setImage(this.image, this.overImages[index].rect);
-            
-
+        
         Hilo.Tween.from(this.getChildById('over'), {alpha:0}, {
             duration: 400,
             ease: Hilo.Ease.Back.EaseIn
@@ -8404,7 +8404,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
 	        this.moveY    = 0;
-	        this.startRotate(6000, 360, true)
+	        this.startRotate(6000, 360, true);
 		},
 		startRotate: function (time, angle, loop) {
 	        var me = this;
@@ -8482,6 +8482,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    			// 弹珠静止
 	    			this.moveX = 0;
 	        		this.isStatic = true;
+
+	        		this.end = true;
 	    		}
 	        }
 	   	},
@@ -9005,7 +9007,9 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	     */
 	    init: function () {
 	    	this.nowAngle = this.startAngle;
+	    	this.rotating  = false;
 
+	    	this.clear();
 	    	this.draw();
 	    },
 	    draw: function () {

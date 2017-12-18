@@ -73,7 +73,7 @@
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
 	        this.moveY    = 0;
-	        this.startRotate(6000, 360, true)
+	        this.startRotate(6000, 360, true);
 		},
 		startRotate: function (time, angle, loop) {
 	        var me = this;
@@ -151,6 +151,8 @@
 	    			// 弹珠静止
 	    			this.moveX = 0;
 	        		this.isStatic = true;
+
+	        		this.end = true;
 	    		}
 	        }
 	   	},

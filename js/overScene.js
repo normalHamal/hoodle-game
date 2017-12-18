@@ -11,6 +11,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
             , {color: 'red',    rect: [0, 750, 667, 375]}
             , {color: 'blue',   rect: [0, 375, 667, 375]}
             , {color: 'green',  rect: [0, 0, 667, 375]}
+            , {rect: [0, 1500, 667, 375]}
         ];
         this.image = properties.image;
         this.init(properties);
@@ -29,7 +30,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 
     show: function (color) {
         this.visible = true;
-        var index    = 0;
+        var index    = 4;
 
         this.overImages.forEach(function (o, i) {
             if (o.color === color) {
@@ -38,8 +39,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
         });
 
         this.getChildById('over').setImage(this.image, this.overImages[index].rect);
-            
-
+        
         Hilo.Tween.from(this.getChildById('over'), {alpha:0}, {
             duration: 400,
             ease: Hilo.Ease.Back.EaseIn
