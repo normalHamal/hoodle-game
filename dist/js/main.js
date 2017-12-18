@@ -8362,7 +8362,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    	this.bounceSquare  = 0.4;
 	    	this.bounceCircle  = 0.7;
 	    	this.radius     = this.pivotX = this.pivotY = this.width >> 1;
-	    	this.moveRange  = [-26, -6];
+	    	this.moveRange  = [-20, -6];
 	    	this.x          = this.startX;
 	        this.y          = this.startY;
 	        this.borderRadius = [
@@ -8537,13 +8537,13 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 		    var limitY = this.activeRect[1] + this.activeRect[3] - this.pivotY;
 		    var limitX = this.activeRect[0] + this.activeRect[2] - this.pivotX;
 
-		    if (y > limitY) {
+		    if (y > limitY && x < 486 || x > 489 && y > this.startY) {
 		        // 弹珠碰触地面
-		        this.y = limitY;
+		        this.y = x < 486 ? limitY : this.startY;
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
-		    } else if (y < this.activeRect[1] + this.pivotY) {
+		    } else if (y < this.activeRect[1] + this.pivotY && (x < this.borderRadius[0].x || x > this.borderRadius[1].x)) {
 		    	this.y = this.activeRect[1] + this.pivotY;
 		    	
 		    	this.collisionSquare('top');
@@ -8861,7 +8861,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 					} else if (hoodle.y < s.y) {
 						hoodle.y = s.y - hoodle.radius;
 						hoodle.collisionSquare('top');
-					} else if (hoodle.x > s.x && hoodle.y < s.y) {
+					} else if (hoodle.x > s.x) {
 						hoodle.x = s.x + s.width + hoodle.radius;
 						hoodle.collisionSquare('right');
 					} else if (hoodle.y > s.y) {

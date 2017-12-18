@@ -64,7 +64,7 @@
 					} else if (hoodle.y < s.y) {
 						hoodle.y = s.y - hoodle.radius;
 						hoodle.collisionSquare('top');
-					} else if (hoodle.x > s.x && hoodle.y < s.y) {
+					} else if (hoodle.x > s.x) {
 						hoodle.x = s.x + s.width + hoodle.radius;
 						hoodle.collisionSquare('right');
 					} else if (hoodle.y > s.y) {
