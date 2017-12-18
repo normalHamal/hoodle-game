@@ -17,6 +17,7 @@ gulp.task('minJs', function () {
 			'js/hoodle.js',
 			'js/obstacles.js',
 			'js/fences.js',
+			'js/bendRod.js',
 			'js/bonus.js',
 			'js/progress.js'
 		])

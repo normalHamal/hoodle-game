@@ -117,9 +117,9 @@
        			//	碰撞
 	            if (distance < 0) {
 	            	//  将弹珠定格在碰撞瞬间的位置
-	            	var theta = Math.atan2(hoodle.y - centerObstacle.y, hoodle.x - centerObstacle.x);
-	            	hoodle.x += Math.abs(distance) * Math.cos(theta)
-	            	hoodle.y += Math.abs(distance) * Math.sin(theta);
+					var theta = Math.atan2(hoodle.y - centerObstacle.y, hoodle.x - centerObstacle.x);
+					hoodle.x  += Math.abs(distance) * Math.cos(theta)
+					hoodle.y  += Math.abs(distance) * Math.sin(theta);
 	            	//  弹珠做出反应
 	            	hoodle.collisionCircle(centerObstacle);
 	            	return true;

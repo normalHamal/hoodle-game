@@ -12,7 +12,11 @@
 			y: vector.y - 2 * t * normal.y
 		}
 	}
-
+	/*
+	*  因为弄了个弹珠一直在旋转的动画，所以设置了弹珠的中心点
+	*  但是就因为设置了中心点导致弹珠的坐标其实就是中心点坐标
+	*  即  hoodle.x = hoodle.pivotX;
+	*/
 	var Hoodle = ns.Hoodle = Hilo.Class.create({
 		Extends: Hilo.Bitmap,
 
@@ -22,14 +26,28 @@
 	        Hoodle.superclass.constructor.call(this, properties);
 	        // 初始化参数
 	        Hilo.util.copy(this, properties, true);
-	    	this.speedUpY  = this.gravity = 0.2;
-	    	this.force     = this.gravity * 0.3;
-	    	this.bounceSquare   = 0.4;
-	    	this.bounceCircle   = 0.7;
-	    	this.radius    = this.pivotX = this.pivotY = this.width >> 1;
-	    	this.moveRange = [-16, -1];
-	    	this.x         = this.startX;
-	        this.y         = this.startY;
+	    	this.speedUpY   = this.gravity = 0.2;
+	    	this.force      = this.gravity * 0.3;
+	    	this.bounceSquare  = 0.4;
+	    	this.bounceCircle  = 0.7;
+	    	this.radius     = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.moveRange  = [-26, -6];
+	    	this.x          = this.startX;
+	        this.y          = this.startY;
+	        this.borderRadius = [
+		        {
+		        	direction: 0,
+		        	x: properties.activeRect[0] + properties.activeRect[2] - 34,
+		        	y: properties.activeRect[1] + 34,
+		        	radius: 34
+		        },
+		        {
+		        	direction: 1,
+		        	x: properties.activeRect[0] + 34,
+		        	y: properties.activeRect[1] + 34,
+		        	radius: 34
+		        }
+	        ]
 	    },
 	    startX:  0,     // 弹珠的起始x坐标
 	    startY:  0, 	// 弹珠的起始y坐标
@@ -45,6 +63,7 @@
 	    radius: 0,      // 弹珠半径
 	    isStatic: true, // 弹珠是否已静止
 	    activeRect: [], // 活动范围
+	    borderRadius: [], // 圆角边界
 	    /*
 	    *  准备阶段
 	    */
@@ -78,7 +97,7 @@
 		startDown: function (ratio) {
 			// 恢复弹珠状态
 			this.isStatic = false;
-			this.moveX = this.moveRange[1] + (this.moveRange[0] - this.moveRange[1]) * ratio;
+			this.moveY = this.moveRange[1] + (this.moveRange[0] - this.moveRange[1]) * ratio;
 		},
 		/**
 		*  碰撞反弹 (针对方形)
@@ -115,8 +134,6 @@
 
    			this.moveX = speed.x * this.bounceCircle;
    			this.moveY = speed.y * this.bounceCircle;
-   			
-   			// this.judgeStatic();
        	},
        	/*
 	   	*  判断弹珠是否停止并更新弹珠状态
@@ -137,6 +154,36 @@
 	    		}
 	        }
 	   	},
+	   	/*
+	   	*  针对边界角(因为是圆角矩形)
+	   	*/
+	   	collisionBorder: function () {
+			var borders = this.borderRadius;
+			var _self  = this;
+			// 检测
+			borders.forEach(function (b) {
+				var isCollision = false;
+				if (b.direction === 0 && b.x < _self.x && b.y > _self.y) {
+					isCollision = true;
+				} else if (b.direction === 1 && b.x > _self.x && b.y > _self.y) {
+					isCollision = true;
+				} // 只判断了圆角矩形边界的左右上半圆
+
+				if (isCollision) {
+					var distance = Math.sqrt(Math.pow((_self.x - b.x), 2) + Math.pow((_self.y - b.y), 2))
+								- b.radius + _self.radius;
+
+					if (distance > 0) {
+						//  将弹珠定格在碰撞瞬间的位置
+						var theta = Math.atan2(b.y - _self.y, b.x - _self.x);
+						_self.x   += Math.abs(distance) * Math.cos(theta);
+						_self.y   += Math.abs(distance) * Math.sin(theta);
+		            	_self.collisionCircle(b);
+					}
+				}
+				
+			});
+	   	},
 		/*
 		*  整个弹跳过程
 		*/
@@ -148,6 +195,9 @@
 		    this.moveY += this.speedUpY;
 		    //  水平位移
 		    this.moveX += this.speedUpX;
+
+		    this.collisionBorder();
+		    
 		    //   y轴坐标
 		    var y = this.y + this.moveY;
 		    //   x轴坐标
@@ -162,8 +212,9 @@
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
-		    } else if (y < this.activeRect[1]) {
-		    	this.y = this.activeRect[1];
+		    } else if (y < this.activeRect[1] + this.pivotY) {
+		    	this.y = this.activeRect[1] + this.pivotY;
+		    	
 		    	this.collisionSquare('top');
 		    } else {
 		    	// 弹珠没有碰到地面
@@ -178,6 +229,7 @@
 	    		// 弹珠没有触碰墙壁
 	    		this.x = x;
 	    	}
+
 		}
 	});
 })(window.game);

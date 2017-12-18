@@ -19,6 +19,7 @@
         bonus: null,     // 奖励
         btn: null,       // 发射按钮
         progress: null,  // 进度条
+        bendRod: null,   // 弯曲杆
         gameReadyScene: null,
         gameOverScene: null,
 
@@ -92,10 +93,11 @@
         */
     	gameReady: function () {
             this.initFences();
+            this.initBendRod();
             this.initBonus();
             this.initObstacles();
             this.initHoodle();
-            this.initProgress(); // 必须初始化在button前面，不然buttondepth太低会无法点击
+            this.initProgress(); // 必须初始化在button前面，不然button.depth太低会无法点击
             this.initButton();
 
     		this.state = 'start';
@@ -186,6 +188,9 @@
                 activeRect: [118, 294, 368, 34]
             }).addTo(this.stage);
         },
+        /*
+        *  初始化奖励栏
+        */
         initBonus: function () {
         	this.bonus = new game.Bonus({
         		id: 'bouns',
@@ -194,6 +199,14 @@
         		width: 368,
         		activeRect: [118, 278, 368, 50]
         	}).addTo(this.stage);
+        },
+        initBendRod: function () {
+            this.bendRod = new game.BendRod({
+                id: 'bendRod',
+                width: this.width,
+                height: this.height,
+                activeRect: [118, 64, 399, 263]
+            }).addTo(this.stage);
         },
         /*
         * 初始化弹珠
@@ -204,9 +217,9 @@
                 image: this.asset.hoodle,
                 width: 14,
                 height: 14,
-                startX: 443,
-                startY: 89,
-                activeRect: [118, 65, 368, 263]
+                startX: 504,
+                startY: 232,
+                activeRect: [118, 64, 399, 263]
             }).addTo(this.stage);
     	},
         /*
@@ -255,10 +268,16 @@
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
-				    //	弹珠发生碰撞    
+				    //	弹珠发生碰撞
+                    console.log('弹珠发生碰撞') 
 				}
                 if (this.fences && this.fences.checkCollision(this.hoodle)) {
                     //  弹珠发生碰撞
+                    console.log('弹珠发生碰撞')
+                }
+                if (this.bendRod && this.bendRod.checkCollision(this.hoodle)) {
+                    //  弹珠发生碰撞
+                    console.log('弹珠发生碰撞')
                 }
             }
         },
