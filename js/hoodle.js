@@ -29,8 +29,8 @@
 	    	this.speedUpY   = this.gravity = 0.2;
 	    	this.force      = this.gravity * 0.3;
 	    	this.bounceSquare  = 0.4;
-	    	this.bounceCircle  = 0.7;
-	    	this.radius     = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.bounceCircle  = 0.6;
+	    	this.radius     = this.width >> 1;
 	    	this.moveRange  = [-20, -6];
 	    	this.x          = this.startX;
 	        this.y          = this.startY;
@@ -73,24 +73,7 @@
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
 	        this.moveY    = 0;
-	        this.startRotate(6000, 360, true);
 		},
-		startRotate: function (time, angle, loop) {
-	        var me = this;
-	        me.stopRotate();
-
-	        time = time || 6000;
-	        angle = angle || 360;
-	        me.rotation = 0;
-	        me.rotateTween = Hilo.Tween.to(me, {rotation:angle}, {time:time, loop:loop});
-	    },
-	    stopRotate: function () {
-	        var me = this;
-	        if (me.rotateTween) {
-	            me.rotateTween.stop();
-	            me.rotateTween = null;
-	        }
-	    },
 		/*
 		*  开始下落
 		*/
@@ -122,8 +105,8 @@
    			}
    			//  撞击平面法向量
    			var normal = {
-   				x: this.x - centerCircle.x,
-   				y: this.y - centerCircle.y
+   				x: this.x - centerCircle.x + this.radius,
+   				y: this.y - centerCircle.y + this.radius
    			}
    			//  将法向量单位化
    			var inv = 1 / Math.sqrt(normal.x * normal.x + normal.y * normal.y);
@@ -172,12 +155,12 @@
 				} // 只判断了圆角矩形边界的左右上半圆
 
 				if (isCollision) {
-					var distance = Math.sqrt(Math.pow((_self.x - b.x), 2) + Math.pow((_self.y - b.y), 2))
+					var distance = Math.sqrt(Math.pow((_self.x - b.x + _self.radius), 2) + Math.pow((_self.y - b.y + _self.radius), 2))
 								- b.radius + _self.radius;
 
 					if (distance > 0) {
 						//  将弹珠定格在碰撞瞬间的位置
-						var theta = Math.atan2(b.y - _self.y, b.x - _self.x);
+						var theta = Math.atan2(b.y - _self.y - _self.radius, b.x - _self.x - _self.radius);
 						_self.x   += Math.abs(distance) * Math.cos(theta);
 						_self.y   += Math.abs(distance) * Math.sin(theta);
 		            	_self.collisionCircle(b);
@@ -198,15 +181,13 @@
 		    //  水平位移
 		    this.moveX += this.speedUpX;
 
-		    this.collisionBorder();
-		    
 		    //   y轴坐标
 		    var y = this.y + this.moveY;
 		    //   x轴坐标
 		    var x = this.x + this.moveX;
 		    //   弹珠运行界限
-		    var limitY = this.activeRect[1] + this.activeRect[3] - this.pivotY;
-		    var limitX = this.activeRect[0] + this.activeRect[2] - this.pivotX;
+		    var limitY = this.activeRect[1] + this.activeRect[3] - this.height;
+		    var limitX = this.activeRect[0] + this.activeRect[2] - this.width;
 
 		    if (y > limitY && x < 486 || x > 489 && y > this.startY) {
 		        // 弹珠碰触地面
@@ -214,8 +195,8 @@
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
-		    } else if (y < this.activeRect[1] + this.pivotY && (x < this.borderRadius[0].x || x > this.borderRadius[1].x)) {
-		    	this.y = this.activeRect[1] + this.pivotY;
+		    } else if (y < this.activeRect[1] && (x < this.borderRadius[0].x || x > this.borderRadius[1].x)) {
+		    	this.y = this.activeRect[1];
 		    	
 		    	this.collisionSquare('top');
 		    } else {
@@ -223,15 +204,16 @@
 				this.y = y;
 		    }
 
-		    if (x < this.activeRect[0] + this.pivotX || x > limitX) {
+		    if (x < this.activeRect[0] || x > limitX) {
 		    	// 弹珠触碰墙壁
-	    		this.x = x > limitX ? limitX : this.activeRect[0] + this.pivotX;
+	    		this.x = x > limitX ? limitX : this.activeRect[0];
 	    		this.collisionSquare('side');
 	    	} else {
 	    		// 弹珠没有触碰墙壁
 	    		this.x = x;
 	    	}
 
+	    	this.collisionBorder();
 		}
 	});
 })(window.game);

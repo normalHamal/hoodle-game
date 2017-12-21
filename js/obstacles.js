@@ -111,13 +111,13 @@
 	       			y: obstacle.y + obstacle.height / 2
 	       		};
 	       		//  障碍物中心点和弹珠中心点距离与两个半径之和的差值
-       			var distance = Math.sqrt(Math.pow((hoodle.x - centerObstacle.x), 2) +
-       					   			Math.pow((hoodle.y - centerObstacle.y), 2)) -
+       			var distance = Math.sqrt(Math.pow((hoodle.x - centerObstacle.x + hoodle.radius), 2) +
+       					   			Math.pow((hoodle.y - centerObstacle.y + hoodle.radius), 2)) -
        									(hoodle.radius + obstacleRadius);
        			//	碰撞
 	            if (distance < 0) {
 	            	//  将弹珠定格在碰撞瞬间的位置
-					var theta = Math.atan2(hoodle.y - centerObstacle.y, hoodle.x - centerObstacle.x);
+					var theta = Math.atan2(hoodle.y - centerObstacle.y + hoodle.radius, hoodle.x - centerObstacle.x + hoodle.radius);
 					hoodle.x  += Math.abs(distance) * Math.cos(theta)
 					hoodle.y  += Math.abs(distance) * Math.sin(theta);
 	            	//  弹珠做出反应

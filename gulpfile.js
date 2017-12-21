@@ -51,3 +51,5 @@ gulp.task('minImage', function () {
 		.pipe(gulp.dest('images'))
 		.pipe(notify({message: "minImage task ok"}))
 });
+
+gulp.task('default', ['minJs', 'minImage']);

@@ -35,12 +35,12 @@
 	    	var b = this.circle;
 
 	    	if (b.x < hoodle.x && b.y > hoodle.y) {
-				var distance = Math.sqrt(Math.pow((hoodle.x - b.x), 2) + Math.pow((hoodle.y - b.y), 2))
+				var distance = Math.sqrt(Math.pow((hoodle.x - b.x + hoodle.radius), 2) + Math.pow((hoodle.y - b.y + hoodle.radius), 2))
 								- b.radius - hoodle.radius;
-
+				//todo:此处应该考虑内圈
 				if (distance < 0) {
 					//  将弹珠定格在碰撞瞬间的位置
-					var theta  = Math.atan2(hoodle.y - b.y, hoodle.x - b.x);
+					var theta  = Math.atan2(hoodle.y - b.y + hoodle.radius, hoodle.x - b.x + hoodle.radius);
 					hoodle.x   += Math.abs(distance) * Math.cos(theta)
 					hoodle.y   += Math.abs(distance) * Math.sin(theta);
 	            	hoodle.collisionCircle(b);
@@ -53,22 +53,22 @@
 				var hit = false;
 				// 圆形和矩形的相交其实就是（圆形的左边界一定小于矩形的右边界，同时圆形的右边界一定大于矩形的左边界）
 				// ！其实对矩形和矩形也是同理
-				hit = hoodle.x <= s.x + s.width + hoodle.radius && s.x <= hoodle.x + hoodle.radius &&
-                  		hoodle.y <= s.y + s.height + hoodle.radius && s.y <= hoodle.y + hoodle.radius;
+				hit = hoodle.x <= s.x + s.width && s.x <= hoodle.x + hoodle.width &&
+                  		hoodle.y <= s.y + s.height && s.y <= hoodle.y + hoodle.height;
 				// 此处不用管矩形的4个角的碰撞
 				if (hit) {
 					// 撞击
 					if (hoodle.x < s.x) {
-						hoodle.x = s.x - hoodle.radius;
+						hoodle.x = s.x - hoodle.width;
 						hoodle.collisionSquare('left');
 					} else if (hoodle.y < s.y) {
-						hoodle.y = s.y - hoodle.radius;
+						hoodle.y = s.y - hoodle.height;
 						hoodle.collisionSquare('top');
 					} else if (hoodle.x > s.x) {
-						hoodle.x = s.x + s.width + hoodle.radius;
+						hoodle.x = s.x + s.width;
 						hoodle.collisionSquare('right');
 					} else if (hoodle.y > s.y) {
-						hoodle.y = s.y + s.height + hoodle.radius;
+						hoodle.y = s.y + s.height;
 						hoodle.collisionSquare('bottom');
 					}
 				}

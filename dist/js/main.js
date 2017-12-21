@@ -8011,7 +8011,6 @@ window.Hilo.ParticleSystem = ParticleSystem;
     		if(this.state !== 'over') {
                 //设置当前状态为结束over
                 this.state = 'over';
-                this.hoodle.stopRotate();
                 //显示结束场景
                 if (!this.stage.contains(this.gameOverScene)) {
                     this.stage.addChild(this.gameOverScene);  
@@ -8118,8 +8117,8 @@ window.Hilo.ParticleSystem = ParticleSystem;
                 image: this.asset.hoodle,
                 width: 14,
                 height: 14,
-                startX: 504,
-                startY: 232,
+                startX: 500,
+                startY: 225,
                 activeRect: [118, 64, 399, 263]
             }).addTo(this.stage);
     	},
@@ -8164,21 +8163,17 @@ window.Hilo.ParticleSystem = ParticleSystem;
             if (this.state === 'start') {
                 return;
             }
-
             if (this.hoodle && this.hoodle.end) {
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
-				    //	弹珠发生碰撞
-                    console.log('弹珠发生碰撞') 
+
 				}
                 if (this.fences && this.fences.checkCollision(this.hoodle)) {
-                    //  弹珠发生碰撞
-                    console.log('弹珠发生碰撞')
+
                 }
                 if (this.bendRod && this.bendRod.checkCollision(this.hoodle)) {
-                    //  弹珠发生碰撞
-                    console.log('弹珠发生碰撞')
+                    
                 }
             }
         },
@@ -8360,8 +8355,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    	this.speedUpY   = this.gravity = 0.2;
 	    	this.force      = this.gravity * 0.3;
 	    	this.bounceSquare  = 0.4;
-	    	this.bounceCircle  = 0.7;
-	    	this.radius     = this.pivotX = this.pivotY = this.width >> 1;
+	    	this.bounceCircle  = 0.6;
+	    	this.radius     = this.width >> 1;
 	    	this.moveRange  = [-20, -6];
 	    	this.x          = this.startX;
 	        this.y          = this.startY;
@@ -8404,24 +8399,7 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	        this.y        = this.startY;
 	        this.speedUpX = 0;
 	        this.moveY    = 0;
-	        this.startRotate(6000, 360, true);
 		},
-		startRotate: function (time, angle, loop) {
-	        var me = this;
-	        me.stopRotate();
-
-	        time = time || 6000;
-	        angle = angle || 360;
-	        me.rotation = 0;
-	        me.rotateTween = Hilo.Tween.to(me, {rotation:angle}, {time:time, loop:loop});
-	    },
-	    stopRotate: function () {
-	        var me = this;
-	        if (me.rotateTween) {
-	            me.rotateTween.stop();
-	            me.rotateTween = null;
-	        }
-	    },
 		/*
 		*  开始下落
 		*/
@@ -8453,8 +8431,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
    			}
    			//  撞击平面法向量
    			var normal = {
-   				x: this.x - centerCircle.x,
-   				y: this.y - centerCircle.y
+   				x: this.x - centerCircle.x + this.radius,
+   				y: this.y - centerCircle.y + this.radius
    			}
    			//  将法向量单位化
    			var inv = 1 / Math.sqrt(normal.x * normal.x + normal.y * normal.y);
@@ -8503,12 +8481,12 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 				} // 只判断了圆角矩形边界的左右上半圆
 
 				if (isCollision) {
-					var distance = Math.sqrt(Math.pow((_self.x - b.x), 2) + Math.pow((_self.y - b.y), 2))
+					var distance = Math.sqrt(Math.pow((_self.x - b.x + _self.radius), 2) + Math.pow((_self.y - b.y + _self.radius), 2))
 								- b.radius + _self.radius;
 
 					if (distance > 0) {
 						//  将弹珠定格在碰撞瞬间的位置
-						var theta = Math.atan2(b.y - _self.y, b.x - _self.x);
+						var theta = Math.atan2(b.y - _self.y - _self.radius, b.x - _self.x - _self.radius);
 						_self.x   += Math.abs(distance) * Math.cos(theta);
 						_self.y   += Math.abs(distance) * Math.sin(theta);
 		            	_self.collisionCircle(b);
@@ -8529,15 +8507,13 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 		    //  水平位移
 		    this.moveX += this.speedUpX;
 
-		    this.collisionBorder();
-		    
 		    //   y轴坐标
 		    var y = this.y + this.moveY;
 		    //   x轴坐标
 		    var x = this.x + this.moveX;
 		    //   弹珠运行界限
-		    var limitY = this.activeRect[1] + this.activeRect[3] - this.pivotY;
-		    var limitX = this.activeRect[0] + this.activeRect[2] - this.pivotX;
+		    var limitY = this.activeRect[1] + this.activeRect[3] - this.height;
+		    var limitX = this.activeRect[0] + this.activeRect[2] - this.width;
 
 		    if (y > limitY && x < 486 || x > 489 && y > this.startY) {
 		        // 弹珠碰触地面
@@ -8545,8 +8521,8 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 		        this.collisionSquare('bottom');
 
 		        this.judgeStatic();
-		    } else if (y < this.activeRect[1] + this.pivotY && (x < this.borderRadius[0].x || x > this.borderRadius[1].x)) {
-		    	this.y = this.activeRect[1] + this.pivotY;
+		    } else if (y < this.activeRect[1] && (x < this.borderRadius[0].x || x > this.borderRadius[1].x)) {
+		    	this.y = this.activeRect[1];
 		    	
 		    	this.collisionSquare('top');
 		    } else {
@@ -8554,15 +8530,16 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 				this.y = y;
 		    }
 
-		    if (x < this.activeRect[0] + this.pivotX || x > limitX) {
+		    if (x < this.activeRect[0] || x > limitX) {
 		    	// 弹珠触碰墙壁
-	    		this.x = x > limitX ? limitX : this.activeRect[0] + this.pivotX;
+	    		this.x = x > limitX ? limitX : this.activeRect[0];
 	    		this.collisionSquare('side');
 	    	} else {
 	    		// 弹珠没有触碰墙壁
 	    		this.x = x;
 	    	}
 
+	    	this.collisionBorder();
 		}
 	});
 })(window.game);
@@ -8679,13 +8656,13 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	       			y: obstacle.y + obstacle.height / 2
 	       		};
 	       		//  障碍物中心点和弹珠中心点距离与两个半径之和的差值
-       			var distance = Math.sqrt(Math.pow((hoodle.x - centerObstacle.x), 2) +
-       					   			Math.pow((hoodle.y - centerObstacle.y), 2)) -
+       			var distance = Math.sqrt(Math.pow((hoodle.x - centerObstacle.x + hoodle.radius), 2) +
+       					   			Math.pow((hoodle.y - centerObstacle.y + hoodle.radius), 2)) -
        									(hoodle.radius + obstacleRadius);
        			//	碰撞
 	            if (distance < 0) {
 	            	//  将弹珠定格在碰撞瞬间的位置
-					var theta = Math.atan2(hoodle.y - centerObstacle.y, hoodle.x - centerObstacle.x);
+					var theta = Math.atan2(hoodle.y - centerObstacle.y + hoodle.radius, hoodle.x - centerObstacle.x + hoodle.radius);
 					hoodle.x  += Math.abs(distance) * Math.cos(theta)
 					hoodle.y  += Math.abs(distance) * Math.sin(theta);
 	            	//  弹珠做出反应
@@ -8753,16 +8730,16 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	            	// 将弹珠定格在碰撞瞬间的位置
 
 	            	// 判断撞击左边
-	            	if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x > fence.x - hoodle.radius && hoodle.x
+	            	if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x > fence.x - hoodle.width && hoodle.x
 	            		 < fence.x) {
-	            		hoodle.x = fence.x - hoodle.radius;
+	            		hoodle.x = fence.x - hoodle.width;
 	            		// 弹珠做出反应
 	            		hoodle.collisionSquare('left');
 	            	}
 	            	// 判断撞击右边
-	            	else if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x < fence.x + fence.width + hoodle.radius &&
+	            	else if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x < fence.x + fence.width &&
 	            		 hoodle.x > fence.x) {
-	            		hoodle.x = fence.x + fence.width + hoodle.radius;
+	            		hoodle.x = fence.x + fence.width;
 	            		// 弹珠做出反应
 	            		hoodle.collisionSquare('right');
 	            	}
@@ -8774,13 +8751,13 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 			       			y: fence.y + this.topCircleRadius
 			       		};
 			       		//  障碍物上半中心点和弹珠中心点距离与两个半径之和的差值
-		       			var distance = Math.sqrt(Math.pow((hoodle.x - centerFence.x), 2) +
-		       					   			Math.pow((hoodle.y - centerFence.y), 2)) -
+		       			var distance = Math.sqrt(Math.pow((hoodle.x - centerFence.x + hoodle.radius), 2) +
+		       					   			Math.pow((hoodle.y - centerFence.y + hoodle.radius), 2)) -
 		       									(hoodle.radius + this.topCircleRadius);
 		       			//	碰撞
 			            if (distance < 0) {
 			            	//  将弹珠定格在碰撞瞬间的位置
-			            	var theta = Math.atan2(hoodle.y - centerFence.y, hoodle.x - centerFence.x);
+			            	var theta = Math.atan2(hoodle.y - centerFence.y + hoodle.radius, hoodle.x - centerFence.x + hoodle.radius);
 			            	hoodle.x += Math.abs(distance) * Math.cos(theta)
 			            	hoodle.y += Math.abs(distance) * Math.sin(theta);
 			            	//  弹珠做出反应
@@ -8834,12 +8811,12 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 	    	var b = this.circle;
 
 	    	if (b.x < hoodle.x && b.y > hoodle.y) {
-				var distance = Math.sqrt(Math.pow((hoodle.x - b.x), 2) + Math.pow((hoodle.y - b.y), 2))
+				var distance = Math.sqrt(Math.pow((hoodle.x - b.x + hoodle.radius), 2) + Math.pow((hoodle.y - b.y + hoodle.radius), 2))
 								- b.radius - hoodle.radius;
-
+				//todo:此处应该考虑内圈
 				if (distance < 0) {
 					//  将弹珠定格在碰撞瞬间的位置
-					var theta  = Math.atan2(hoodle.y - b.y, hoodle.x - b.x);
+					var theta  = Math.atan2(hoodle.y - b.y + hoodle.radius, hoodle.x - b.x + hoodle.radius);
 					hoodle.x   += Math.abs(distance) * Math.cos(theta)
 					hoodle.y   += Math.abs(distance) * Math.sin(theta);
 	            	hoodle.collisionCircle(b);
@@ -8852,22 +8829,22 @@ var OverScene = ns.OverScene = Hilo.Class.create({
 				var hit = false;
 				// 圆形和矩形的相交其实就是（圆形的左边界一定小于矩形的右边界，同时圆形的右边界一定大于矩形的左边界）
 				// ！其实对矩形和矩形也是同理
-				hit = hoodle.x <= s.x + s.width + hoodle.radius && s.x <= hoodle.x + hoodle.radius &&
-                  		hoodle.y <= s.y + s.height + hoodle.radius && s.y <= hoodle.y + hoodle.radius;
+				hit = hoodle.x <= s.x + s.width && s.x <= hoodle.x + hoodle.width &&
+                  		hoodle.y <= s.y + s.height && s.y <= hoodle.y + hoodle.height;
 				// 此处不用管矩形的4个角的碰撞
 				if (hit) {
 					// 撞击
 					if (hoodle.x < s.x) {
-						hoodle.x = s.x - hoodle.radius;
+						hoodle.x = s.x - hoodle.width;
 						hoodle.collisionSquare('left');
 					} else if (hoodle.y < s.y) {
-						hoodle.y = s.y - hoodle.radius;
+						hoodle.y = s.y - hoodle.height;
 						hoodle.collisionSquare('top');
 					} else if (hoodle.x > s.x) {
-						hoodle.x = s.x + s.width + hoodle.radius;
+						hoodle.x = s.x + s.width;
 						hoodle.collisionSquare('right');
 					} else if (hoodle.y > s.y) {
-						hoodle.y = s.y + s.height + hoodle.radius;
+						hoodle.y = s.y + s.height;
 						hoodle.collisionSquare('bottom');
 					}
 				}

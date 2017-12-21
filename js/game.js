@@ -110,7 +110,6 @@
     		if(this.state !== 'over') {
                 //设置当前状态为结束over
                 this.state = 'over';
-                this.hoodle.stopRotate();
                 //显示结束场景
                 if (!this.stage.contains(this.gameOverScene)) {
                     this.stage.addChild(this.gameOverScene);  
@@ -217,8 +216,8 @@
                 image: this.asset.hoodle,
                 width: 14,
                 height: 14,
-                startX: 504,
-                startY: 232,
+                startX: 500,
+                startY: 225,
                 activeRect: [118, 64, 399, 263]
             }).addTo(this.stage);
     	},
@@ -263,21 +262,17 @@
             if (this.state === 'start') {
                 return;
             }
-
             if (this.hoodle && this.hoodle.end) {
                 this.gameOver();
             } else {
 				if (this.obstacles && this.obstacles.checkCollision(this.hoodle)) {
-				    //	弹珠发生碰撞
-                    console.log('弹珠发生碰撞') 
+
 				}
                 if (this.fences && this.fences.checkCollision(this.hoodle)) {
-                    //  弹珠发生碰撞
-                    console.log('弹珠发生碰撞')
+
                 }
                 if (this.bendRod && this.bendRod.checkCollision(this.hoodle)) {
-                    //  弹珠发生碰撞
-                    console.log('弹珠发生碰撞')
+                    
                 }
             }
         },

@@ -54,16 +54,16 @@
 	            	// 将弹珠定格在碰撞瞬间的位置
 
 	            	// 判断撞击左边
-	            	if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x > fence.x - hoodle.radius && hoodle.x
+	            	if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x > fence.x - hoodle.width && hoodle.x
 	            		 < fence.x) {
-	            		hoodle.x = fence.x - hoodle.radius;
+	            		hoodle.x = fence.x - hoodle.width;
 	            		// 弹珠做出反应
 	            		hoodle.collisionSquare('left');
 	            	}
 	            	// 判断撞击右边
-	            	else if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x < fence.x + fence.width + hoodle.radius &&
+	            	else if (hoodle.y > fence.y + this.topCircleRadius && hoodle.x < fence.x + fence.width &&
 	            		 hoodle.x > fence.x) {
-	            		hoodle.x = fence.x + fence.width + hoodle.radius;
+	            		hoodle.x = fence.x + fence.width;
 	            		// 弹珠做出反应
 	            		hoodle.collisionSquare('right');
 	            	}
@@ -75,13 +75,13 @@
 			       			y: fence.y + this.topCircleRadius
 			       		};
 			       		//  障碍物上半中心点和弹珠中心点距离与两个半径之和的差值
-		       			var distance = Math.sqrt(Math.pow((hoodle.x - centerFence.x), 2) +
-		       					   			Math.pow((hoodle.y - centerFence.y), 2)) -
+		       			var distance = Math.sqrt(Math.pow((hoodle.x - centerFence.x + hoodle.radius), 2) +
+		       					   			Math.pow((hoodle.y - centerFence.y + hoodle.radius), 2)) -
 		       									(hoodle.radius + this.topCircleRadius);
 		       			//	碰撞
 			            if (distance < 0) {
 			            	//  将弹珠定格在碰撞瞬间的位置
-			            	var theta = Math.atan2(hoodle.y - centerFence.y, hoodle.x - centerFence.x);
+			            	var theta = Math.atan2(hoodle.y - centerFence.y + hoodle.radius, hoodle.x - centerFence.x + hoodle.radius);
 			            	hoodle.x += Math.abs(distance) * Math.cos(theta)
 			            	hoodle.y += Math.abs(distance) * Math.sin(theta);
 			            	//  弹珠做出反应
