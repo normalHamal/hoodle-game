@@ -26,7 +26,8 @@
 	    	
 	    	this.createObstacles(properties.image);
 	    },
-	    amount: 0,
+	    amount: 0, // 最大障碍物个数
+        showAmount: 0, // 当前显示的障碍物个数
 	    obstacleImages: [],
 	    paddingX: 0,
 	    paddingY: 0,
@@ -74,10 +75,14 @@
             }
             // obstacle.x = overflowX > 0 ? (this.startX = overflowX + this.paddingX, this.startY += this.baseSpaceY + Math.random() * this.floatSpace >> 0) : this.startX;
             var overflowY = this.startY + obstacle.height + this.paddingY - this.height;
-            obstacle.y = overflowY > 0 ? this.startY - overflowY : this.startY;
-
-            obstacle.x = this.startX + this.activeRect[0];
-            obstacle.y += this.activeRect[1];
+            if(overflowY > 0) {
+                // 当障碍物要超出可存在范围时将其透明化处理
+                obstacle.alpha = 0;
+            } else {
+                this.showAmount++;
+                obstacle.x = this.startX + this.activeRect[0];
+                obstacle.y = this.startY + this.activeRect[1];
+            }
 	    },
 	    /*
 	    *	重置障碍物位置（并不重新创建而只是改变位置）
@@ -103,7 +108,7 @@
    			var obstacleRadius = this.children[0].width >> 1;
 
        		//  遍历所有障碍物
-	    	for(var i = 0, l = this.children.length; i < l; i += 1) {
+	    	for(var i = 0, l = this.showAmount; i < l; i += 1) {
 	    		var obstacle = this.children[i];
 	    		//  障碍物圆心
 	       		var centerObstacle = {
