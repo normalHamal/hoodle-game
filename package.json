@@ -7,12 +7,12 @@
     "server": "./node_modules/.bin/gulp server"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-imagemin": "^4.0.0",
-    "gulp-notify": "^3.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^3.0.0",
-    "gulp-webserver": "^0.9.1"
+    "gulp": "3.9.1",
+    "gulp-concat": "2.6.1",
+    "gulp-imagemin": "4.0.0",
+    "gulp-notify": "3.0.0",
+    "gulp-rename": "1.2.2",
+    "gulp-uglify": "3.0.0",
+    "gulp-webserver": "0.9.1"
   }
 }
