@@ -13,13 +13,13 @@
         load: function() {
             // 图片素材列表
             var resources = [
-                {id: 'ready', src: 'images/ready.png'},
-                {id: 'over', src: 'images/over.png'},
-                {id: 'hoodle', src: 'images/hoodle.png'},
-                {id: 'obstacles', src: 'images/obstacles.png'},
-                {id: 'fence', src: 'images/fence.png'},
-                {id: 'bonus', src: 'images/bonus.png'},
-                {id: 'button', src: 'images/button.png'}
+                {id: 'ready', src: ns.basicSourceUrl + 'images/ready.png'},
+                {id: 'over', src: ns.basicSourceUrl + 'images/over.png'},
+                {id: 'hoodle', src: ns.basicSourceUrl + 'images/hoodle.png'},
+                {id: 'obstacles', src: ns.basicSourceUrl + 'images/obstacles.png'},
+                {id: 'fence', src: ns.basicSourceUrl + 'images/fence.png'},
+                {id: 'bonus', src: ns.basicSourceUrl + 'images/bonus.png'},
+                {id: 'button', src: ns.basicSourceUrl + 'images/button.png'}
             ];
 
             this.queue = new Hilo.LoadQueue(); // 实例化一个下载队列 

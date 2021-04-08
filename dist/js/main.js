@@ -7906,7 +7906,8 @@ window.Hilo.ParticleSystem = ParticleSystem;
     }
 
     var game = global.game = {
-        container: document.getElementById('hoodle-container'),
+        basicSourceUrl: global['__HOODLE_GAME_RESOURCE_BASEURL__'] || '/',
+
     	width: 0,        // 舞台宽
         height: 0,       // 舞台高
 
@@ -7937,9 +7938,10 @@ window.Hilo.ParticleSystem = ParticleSystem;
         *   初始化舞台
         */
     	initStage: function () {
+            var container = document.getElementById('hoodle-container');
     		this.width  = 667; // 初始化舞台宽
     		this.height = 375; // 初始化舞台高
-    		this.scale = 1;   // 初始化舞台缩放比
+    		this.scale = container.dataset.scale || 1;   // 初始化舞台缩放比
 
     	    // 实例化一个舞台对象
     	    var stage = this.stage = new Hilo.Stage({
@@ -7950,7 +7952,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
     	        scaleY: this.scale
     	    });
 
-    	    this.container.appendChild(this.stage.canvas); // 把canvas画布添加到body中
+    	    container.appendChild(this.stage.canvas); // 把canvas画布添加到body中
 
     	    /* 启动计时器 */
     		    
@@ -8027,11 +8029,11 @@ window.Hilo.ParticleSystem = ParticleSystem;
     		var bgWidth  = this.width * this.scale;  // 舞台实际宽
     		var bgHeight = this.height * this.scale; // 舞台实际高
     		// 往body标签内最后插入一个div
-    	    this.container.insertBefore(Hilo.createElement('div', {
+    	    document.getElementById('hoodle-container').insertBefore(Hilo.createElement('div', {
     	        id: 'bg',
     	        style: {
     	            position: 'absolute',
-    	            background: 'url(images/bg.png) no-repeat',
+    	            background: 'url(' + this.basicSourceUrl + 'images/bg.png) no-repeat',
     	            backgroundSize: 'cover',
     	            width: bgWidth + 'px',
     	            height: bgHeight + 'px'
@@ -8198,13 +8200,13 @@ window.Hilo.ParticleSystem = ParticleSystem;
         load: function() {
             // 图片素材列表
             var resources = [
-                {id: 'ready', src: 'images/ready.png'},
-                {id: 'over', src: 'images/over.png'},
-                {id: 'hoodle', src: 'images/hoodle.png'},
-                {id: 'obstacles', src: 'images/obstacles.png'},
-                {id: 'fence', src: 'images/fence.png'},
-                {id: 'bonus', src: 'images/bonus.png'},
-                {id: 'button', src: 'images/button.png'}
+                {id: 'ready', src: ns.basicSourceUrl + 'images/ready.png'},
+                {id: 'over', src: ns.basicSourceUrl + 'images/over.png'},
+                {id: 'hoodle', src: ns.basicSourceUrl + 'images/hoodle.png'},
+                {id: 'obstacles', src: ns.basicSourceUrl + 'images/obstacles.png'},
+                {id: 'fence', src: ns.basicSourceUrl + 'images/fence.png'},
+                {id: 'bonus', src: ns.basicSourceUrl + 'images/bonus.png'},
+                {id: 'button', src: ns.basicSourceUrl + 'images/button.png'}
             ];
 
             this.queue = new Hilo.LoadQueue(); // 实例化一个下载队列 

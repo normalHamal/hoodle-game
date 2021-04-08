@@ -5,6 +5,8 @@
     }
 
     var game = global.game = {
+        basicSourceUrl: global['__HOODLE_GAME_RESOURCE_BASEURL__'] || '/',
+
     	width: 0,        // 舞台宽
         height: 0,       // 舞台高
 
@@ -130,7 +132,7 @@
     	        id: 'bg',
     	        style: {
     	            position: 'absolute',
-    	            background: 'url(images/bg.png) no-repeat',
+    	            background: 'url(' + this.basicSourceUrl + 'images/bg.png) no-repeat',
     	            backgroundSize: 'cover',
     	            width: bgWidth + 'px',
     	            height: bgHeight + 'px'
