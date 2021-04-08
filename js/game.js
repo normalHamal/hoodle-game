@@ -35,9 +35,10 @@
         *   初始化舞台
         */
     	initStage: function () {
+            var container = document.getElementById('hoodle-container');
     		this.width  = 667; // 初始化舞台宽
     		this.height = 375; // 初始化舞台高
-    		this.scale = 1;   // 初始化舞台缩放比
+    		this.scale = container.dataset.scale || 1;   // 初始化舞台缩放比
 
     	    // 实例化一个舞台对象
     	    var stage = this.stage = new Hilo.Stage({
@@ -48,7 +49,7 @@
     	        scaleY: this.scale
     	    });
 
-    	    document.body.appendChild(this.stage.canvas); // 把canvas画布添加到body中
+    	    container.appendChild(this.stage.canvas); // 把canvas画布添加到body中
 
     	    /* 启动计时器 */
     		    
@@ -125,7 +126,7 @@
     		var bgWidth  = this.width * this.scale;  // 舞台实际宽
     		var bgHeight = this.height * this.scale; // 舞台实际高
     		// 往body标签内最后插入一个div
-    	    document.body.insertBefore(Hilo.createElement('div', {
+    	    document.getElementById('hoodle-container').insertBefore(Hilo.createElement('div', {
     	        id: 'bg',
     	        style: {
     	            position: 'absolute',

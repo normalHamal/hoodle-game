@@ -7906,6 +7906,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
     }
 
     var game = global.game = {
+        container: document.getElementById('hoodle-container'),
     	width: 0,        // 舞台宽
         height: 0,       // 舞台高
 
@@ -7949,7 +7950,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
     	        scaleY: this.scale
     	    });
 
-    	    document.body.appendChild(this.stage.canvas); // 把canvas画布添加到body中
+    	    this.container.appendChild(this.stage.canvas); // 把canvas画布添加到body中
 
     	    /* 启动计时器 */
     		    
@@ -8026,7 +8027,7 @@ window.Hilo.ParticleSystem = ParticleSystem;
     		var bgWidth  = this.width * this.scale;  // 舞台实际宽
     		var bgHeight = this.height * this.scale; // 舞台实际高
     		// 往body标签内最后插入一个div
-    	    document.body.insertBefore(Hilo.createElement('div', {
+    	    this.container.insertBefore(Hilo.createElement('div', {
     	        id: 'bg',
     	        style: {
     	            position: 'absolute',
