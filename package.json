@@ -7,7 +7,7 @@
     "server": "./node_modules/.bin/gulp server"
   },
   "devDependencies": {
-    "gulp": "3.9.1",
+    "gulp": "4.0.2",
     "gulp-concat": "2.6.1",
     "gulp-imagemin": "4.0.0",
     "gulp-notify": "3.0.0",
